@@ -24,7 +24,11 @@ $siteUrl = $team.project.projectPage
 if ($siteRepo -notmatch '^[\w.-]+/[\w.-]+$' -or -not $siteUrl) {
     throw "Set project.siteRepository and project.projectPage in app/python/content/team.json."
 }
-$basePath = ([Uri]$siteUrl).AbsolutePath.TrimEnd('/')
+$siteUri = [Uri]$siteUrl
+$basePath = $siteUri.AbsolutePath.TrimEnd('/')
+# A custom domain (e.g. drishti.example.com) is served from the site root and
+# needs a CNAME file; a github.io project page is served under /<repo>.
+$customDomain = if ($siteUri.Host -notlike "*.github.io") { $siteUri.Host } else { $null }
 
 # ------------------------------------------------------------ repository
 gh repo view $siteRepo --json name 2>$null | Out-Null
@@ -38,8 +42,12 @@ if ($LASTEXITCODE -ne 0) {
 # ----------------------------------------------------------------- build
 $out = Join-Path $root "site"
 Write-Step "Building the static site (base path $basePath)"
-& $venvPython (Join-Path $root "tools\pages\build_pages.py") --base $basePath --out $out
+# --base=<value> in one argument: Windows PowerShell drops an empty "" argument.
+& $venvPython (Join-Path $root "tools\pages\build_pages.py") "--base=$basePath" --out $out
 if ($LASTEXITCODE -ne 0) { throw "The site build failed." }
+if ($customDomain) {
+    [IO.File]::WriteAllText((Join-Path $out "CNAME"), "$customDomain`n")
+}
 
 # --------------------------------------------------------------- publish
 $codeCommit = (git -C $root rev-parse --short HEAD 2>$null)

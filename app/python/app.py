@@ -95,8 +95,16 @@ def rate_limited(limiter_name):
 # scan page points visitors at the live server instead.
 app.config.setdefault("STATIC_SITE", False)
 
+def _pages_origin() -> str:
+    """Origin of the public website (project.projectPage in team.json),
+    e.g. https://drishti.example.com. PAGES_ORIGIN overrides it."""
+    page = load_team().get("project", {}).get("projectPage") or ""
+    m = re.match(r"https://[A-Za-z0-9.-]+", page.strip())
+    return m.group(0).lower() if m else "https://shaurya-web548.github.io"
+
+
 # The GitHub Pages site may ask the live server whether it is up.
-PAGES_ORIGIN = os.environ.get("PAGES_ORIGIN", "https://shaurya-web548.github.io")
+PAGES_ORIGIN = os.environ.get("PAGES_ORIGIN") or _pages_origin()
 
 
 def _github_slug(url: str) -> str:

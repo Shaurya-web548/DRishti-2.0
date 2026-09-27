@@ -271,7 +271,7 @@ There are two ways to put DRishti online, and they work together.
 |---|---|---|
 | Start it | Double-click **Go Live.cmd** (or run `.
 un-public.ps1`) | Run `.\publish-site.ps1` after changing the site |
-| Address | Random `https://…trycloudflare.com`, new on every start | https://shaurya-web548.github.io/DRishti-site/ (permanent) |
+| Address | Random `https://…trycloudflare.com`, new on every start | https://drishti.kandu.kr/ (permanent, GitHub Pages) |
 | Screening | Yes, runs MATLAB | Links to the live server when it is online |
 | Simulink model | Runs in MATLAB | Runs in the visitor's browser (JavaScript ports) |
 | Needs | This laptop on, window open | Nothing, always up |
