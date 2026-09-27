@@ -9,11 +9,11 @@
   <div class="wrap">
     <span class="feature-tag">Major feature</span>
     <h1>Where does a district screening programme break?</h1>
-    <p class="lede">A year of screening, simulated in MATLAB. Change the resources and the model
+    <p class="lede">A year of screening, simulated {% if static_site %}from our MATLAB models, right here in your browser{% else %}in MATLAB{% endif %}. Change the resources and the model
        finds the queue that saturates first. The flow model runs from our Simulink block diagram,
        and a discrete-event simulation of every patient checks it.</p>
     <p class="engine" id="engineBadge" aria-live="polite">
-      <span class="engine-dot"></span><span id="engineText">Connecting to MATLAB&hellip;</span>
+      <span class="engine-dot"></span><span id="engineText">{% if static_site %}Preparing the simulation&hellip;{% else %}Connecting to MATLAB&hellip;{% endif %}</span>
     </p>
   </div>
 </section>
@@ -173,5 +173,9 @@
 {% endblock %}
 
 {% block scripts %}
+{% if static_site %}
+<script>window.DRISHTI_STATIC = true;</script>
+<script src="{{ url_for('static', filename='js/capacity-engine.js') }}"></script>
+{% endif %}
 <script src="{{ url_for('static', filename='js/simulink.js') }}"></script>
 {% endblock %}

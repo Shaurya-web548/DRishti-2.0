@@ -89,6 +89,34 @@ def rate_limited(limiter_name):
     return decorate
 
 
+# Set by tools/pages/build_pages.py when rendering the GitHub Pages copy,
+# which has no MATLAB: the Simulink page then runs in the browser and the
+# scan page points visitors at the live server instead.
+app.config.setdefault("STATIC_SITE", False)
+
+# The GitHub Pages site may ask the live server whether it is up.
+PAGES_ORIGIN = os.environ.get("PAGES_ORIGIN", "https://shaurya-web548.github.io")
+
+
+def _github_slug(url: str) -> str:
+    url = (url or "").rstrip("/")
+    return url.split("github.com/")[-1] if "github.com/" in url else ""
+
+
+@app.context_processor
+def site_mode():
+    """Values every template may need. The live-status file lives in the
+    public site repository, because the code repository may be private."""
+    project = load_team().get("project", {})
+    live_repo = project.get("siteRepository") or project.get("repository")
+    return {
+        "static_site": app.config["STATIC_SITE"],
+        "repo_slug": _github_slug(live_repo),
+        "project": project,
+        "show_source_links": bool(project.get("showSourceLinks")),
+    }
+
+
 @app.after_request
 def security_headers(response):
     """Conservative defaults for a site reachable from the internet."""
@@ -136,6 +164,17 @@ def about():
 
 
 # ------------------------------------------------------------------ API
+
+@app.route("/api/health")
+def health():
+    """Tiny liveness check. The GitHub Pages site calls it cross-origin to
+    decide whether to offer the live screening link, so it allows exactly that
+    one origin and nothing else."""
+    res = jsonify({"ok": True})
+    res.headers["Access-Control-Allow-Origin"] = PAGES_ORIGIN
+    res.headers["Cache-Control"] = "no-store"
+    return res
+
 
 @app.route("/api/scan", methods=["POST"])
 @rate_limited("SCAN_LIMITER")

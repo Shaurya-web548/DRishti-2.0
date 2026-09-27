@@ -263,18 +263,24 @@ Open <http://localhost:5000>:
 `/simulink?preset=growth` opens straight into the 150,000-patient scenario,
 which is handy for a demo. The other presets are `minimum` and `slow`.
 
-### 5. Put it on a public link (demos)
+### 5. Deploying
 
-```powershell
-.un-public.ps1
-```
+There are two ways to put DRishti online, and they work together.
 
-This starts a production server (waitress, debug off) on `127.0.0.1` and
-opens a Cloudflare quick tunnel, then prints a public `https://…trycloudflare.com`
-link. Keep the window open; Ctrl+C takes the site offline and stops MATLAB.
+| | Live server (your laptop) | Website (GitHub Pages) |
+|---|---|---|
+| Start it | Double-click **Go Live.cmd** (or run `.un-public.ps1`) | Run `.\publish-site.ps1` after changing the site |
+| Address | Random `https://…trycloudflare.com`, new on every start | https://shaurya-web548.github.io/DRishti-site/ (permanent) |
+| Screening | Yes, runs MATLAB | Links to the live server when it is online |
+| Simulink model | Runs in MATLAB | Runs in the visitor's browser (JavaScript ports) |
+| Needs | This laptop on, window open | Nothing, always up |
 
-- The link changes every time the script starts, and only works while this
-  machine is on and the script is running.
+**Live server.** `Go Live.cmd` starts a production server (waitress, debug off,
+bound to `127.0.0.1`), opens a Cloudflare quick tunnel and prints the public
+link. It also tells the website, so the website's scan page shows an
+"Open live screening" button. Close the window or press Ctrl+C to go offline;
+that stops MATLAB and marks the website offline.
+
 - Visitors are rate-limited (10 scans, 30 reports and 120 simulations per
   10 minutes each) and uploaded photographs are deleted after 24 hours.
   Tune with `SCAN_LIMIT`, `REPORT_LIMIT`, `SIMULATE_LIMIT` and
@@ -282,6 +288,18 @@ link. Keep the window open; Ctrl+C takes the site offline and stops MATLAB.
 - Never expose `run-local.ps1`: it runs Flask's debugger, which must not be
   reachable from the internet.
 - Serving MATLAB results publicly is subject to your MATLAB licence terms.
+
+**Website.** `publish-site.ps1` renders the same templates as static files
+(`tools/pages/build_pages.py`) and pushes only those files to the public
+repository `DRishti-site`, which serves them on GitHub Pages. This code
+repository can stay private. The online/offline status lives on that
+repository's `live` branch and is written by `tools/live-status.ps1`; the
+website also pings the live server's `/api/health` itself, so a laptop that
+simply switched off shows as offline.
+
+Links to the source code are hidden on the website while the code
+repositories are private. Set `showSourceLinks` to `true` in
+`app/python/content/team.json` if you make them public.
 
 ---
 

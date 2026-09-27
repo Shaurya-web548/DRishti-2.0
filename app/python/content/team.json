@@ -1,5 +1,5 @@
 {
-  "_readme": "Edit this one file to update the team everywhere: the About page reads it on every request, and tools/report/build_report.js reads it when generating the project report. Links must start with https:// (anything else is dropped for safety).",
+  "_readme": "Edit this one file to update the team everywhere: the About page reads it on every request, and tools/report/build_report.js reads it when generating the project report. Links must start with https:// (anything else is dropped for safety). showSourceLinks: set true once the code repositories are public; while they are private the site hides links that would 404 for visitors. siteRepository is the public repo that holds only the built website (GitHub Pages).",
   "project": {
     "name": "DRishti",
     "tagline": "Diabetic retinopathy screening that a district can actually run",
@@ -8,7 +8,9 @@
     "institution": "",
     "repository": "https://github.com/Shaurya-web548/DRishti-2.0",
     "previousVersion": "https://github.com/Shaurya-web548/DRishti",
-    "projectPage": "https://shaurya-web548.github.io/DRishti/"
+    "showSourceLinks": false,
+    "siteRepository": "https://github.com/Shaurya-web548/DRishti-site",
+    "projectPage": "https://shaurya-web548.github.io/DRishti-site/"
   },
   "mentors": [
     {

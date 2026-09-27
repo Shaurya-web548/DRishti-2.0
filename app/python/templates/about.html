@@ -224,10 +224,10 @@
   <div class="wrap closing-grid reveal">
     <div>
       <h2>Explore the project</h2>
-      <p>Read the source, try a screening, or stress-test a district in the Simulink model.</p>
+      <p>Try a screening, or stress-test a district in the Simulink model.</p>
     </div>
     <div class="cta-row">
-      {% if project.repository %}<a class="btn btn-outline" href="{{ project.repository }}" rel="noopener">Source code</a>{% endif %}
+      {% if show_source_links and project.repository %}<a class="btn btn-outline" href="{{ project.repository }}" rel="noopener">Source code</a>{% endif %}
       <a class="btn btn-primary" href="{{ url_for('scan_page') }}">Start a screening</a>
       <a class="btn btn-feature" href="{{ url_for('simulink_page') }}">Simulink model</a>
     </div>

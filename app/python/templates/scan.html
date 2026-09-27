@@ -16,6 +16,25 @@
 
 <section class="tool wrap">
   <div class="tool-grid">
+    {% if static_site %}
+    <div class="panel live-panel" id="scan" data-repo="{{ repo_slug }}">
+      <div class="live-state" id="liveState" data-state="checking" role="status" aria-live="polite">
+        <span class="live-orb" aria-hidden="true"></span>
+        <h2 id="liveTitle">Checking whether live screening is online&hellip;</h2>
+        <p id="liveText">Screening runs our MATLAB image-analysis pipeline, so it needs the DRishti
+           server rather than this website.</p>
+        <a class="btn btn-primary hidden" id="liveLink" href="#" rel="noopener">Open live screening</a>
+      </div>
+      <div class="live-more">
+        <h3>Everything else works right here</h3>
+        <ul>
+          <li><a href="{{ url_for('simulink_page') }}">Run the Simulink capacity model</a> &mdash; it simulates in your browser.</li>
+          <li><a href="{{ url_for('how_it_works') }}">See how a scan is graded</a>, stage by stage.</li>
+          <li><a href="{{ url_for('about') }}">Meet the team</a>.</li>
+        </ul>
+      </div>
+    </div>
+    {% else %}
     <div class="panel" id="scan">
       <form id="scanForm" novalidate>
         <label class="upload-drop" id="uploadDrop">
@@ -98,6 +117,8 @@
       </div>
     </div>
 
+    {% endif %}
+
     <aside class="side">
       <div class="side-block">
         <h3>For a gradeable photo</h3>
@@ -125,5 +146,9 @@
 {% endblock %}
 
 {% block scripts %}
+{% if static_site %}
+<script src="{{ url_for('static', filename='js/live-status.js') }}"></script>
+{% else %}
 <script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+{% endif %}
 {% endblock %}

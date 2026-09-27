@@ -77,6 +77,7 @@ $tunnelLog = Join-Path $logDir "tunnel-$stamp.log"
 
 $server = $null
 $tunnel = $null
+$announced = $false
 try {
     # -------------------------------------------------------- web server
     Write-Step "Starting the production server on 127.0.0.1:$Port"
@@ -108,9 +109,21 @@ try {
     if (-not $url) { throw "No public link appeared within 60 seconds. See $tunnelLog" }
 
     Set-Content -Path (Join-Path $logDir "public-url.txt") -Value $url
+
+    # Tell the permanent GitHub Pages site, so its scan page links here.
+    try {
+        & (Join-Path $root "tools\live-status.ps1") -Url $url
+        $announced = $true
+    } catch {
+        Write-Warning "Live, but the GitHub Pages site could not be told: $($_.Exception.Message)"
+    }
+
+    $siteUrl = $null
+    try { $siteUrl = (Get-Content (Join-Path $appDir "content	eam.json") -Raw | ConvertFrom-Json).project.projectPage } catch { }
     Write-Host ""
     Write-Host "  DRishti is live at:  $url" -ForegroundColor Green
     Write-Host "  Simulink demo:       $url/simulink?preset=growth" -ForegroundColor Green
+    if ($siteUrl) { Write-Host "  Permanent website:   $siteUrl  (its scan page now links here)" -ForegroundColor Green }
     Write-Host ""
     Write-Host "  Keep this window open. Press Ctrl+C to take the site offline."
     Start-Process $url
@@ -121,6 +134,9 @@ try {
 finally {
     foreach ($p in @($tunnel, $server)) {
         if ($p) { Stop-Tree $p.Id }
+    }
+    if ($announced) {
+        try { & (Join-Path $root "tools\live-status.ps1") -Offline } catch { Write-Warning "Could not mark the website offline: $($_.Exception.Message)" }
     }
     Write-Host "DRishti is offline."
 }

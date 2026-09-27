@@ -62,9 +62,9 @@
       <div>
         <h4>Project</h4>
         <ul>
-          <li><a href="https://github.com/Shaurya-web548/DRishti-2.0" rel="noopener">Source code (2.0)</a></li>
-          <li><a href="https://github.com/Shaurya-web548/DRishti" rel="noopener">Version 1</a></li>
-          <li><a href="https://shaurya-web548.github.io/DRishti/" rel="noopener">Project page</a></li>
+          {% if show_source_links and project.repository %}<li><a href="{{ project.repository }}" rel="noopener">Source code (2.0)</a></li>{% endif %}
+          {% if show_source_links and project.previousVersion %}<li><a href="{{ project.previousVersion }}" rel="noopener">Version 1</a></li>{% endif %}
+          {% if project.projectPage %}<li><a href="{{ project.projectPage }}" rel="noopener">Project website</a></li>{% endif %}
           <li>Smart India Hackathon · SIH26038</li>
         </ul>
       </div>

@@ -169,3 +169,22 @@
 
 @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes rise { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ----------------------------------------- GitHub Pages: live screening */
+.live-state { display: grid; justify-items: start; gap: 10px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.live-state h2 { margin: 6px 0 0; font-size: clamp(22px, 2.6vw, 28px); }
+.live-state p { margin: 0; color: var(--muted); max-width: 46ch; }
+.live-orb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #b9c4be;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+  animation: dot-pulse 1.6s ease-out infinite;
+}
+.live-state[data-state="online"] .live-orb { background: #3fae6b; box-shadow: 0 0 0 0 rgba(63, 174, 107, 0.6); }
+.live-state[data-state="offline"] .live-orb { background: var(--coral); animation: none; }
+.live-state .btn { margin-top: 6px; }
+.live-more { padding-top: 18px; }
+.live-more h3 { margin: 0 0 10px; font-size: 18px; }
+.live-more ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--muted); }

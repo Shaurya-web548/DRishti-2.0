@@ -112,8 +112,31 @@
 
   /* ================================================================ run */
 
+  // GitHub Pages build: no server, so run the JavaScript ports of the models.
+  function runInBrowser() {
+    setBusy(true);
+    // Let the busy state paint before the ~0.2 s simulation blocks the thread.
+    setTimeout(() => {
+      try {
+        const data = window.DRishtiCapacity.runScenario(params());
+        lastResult = data;
+        render(data);
+        $('simError').classList.add('hidden');
+      } catch (err) {
+        $('simError').textContent = err.message;
+        $('simError').classList.remove('hidden');
+      } finally {
+        setBusy(false);
+      }
+    }, 30);
+  }
+
   async function run() {
     clearTimeout(debounceTimer);
+    if (window.DRISHTI_STATIC && window.DRishtiCapacity) {
+      runInBrowser();
+      return;
+    }
     if (inFlight) inFlight.abort();
     const controller = new AbortController();
     inFlight = controller;
@@ -172,9 +195,10 @@
   }
 
   function render(r) {
-    const engineLabel = r.engine === 'simulink'
-      ? 'Flow model simulated in Simulink'
-      : 'Simulink block diagram solved in base MATLAB (Simulink not installed on this machine)';
+    const engineLabel = {
+      simulink: 'Flow model simulated in Simulink',
+      browser: 'Running in your browser: JavaScript ports of the MATLAB models',
+    }[r.engine] || 'Simulink block diagram solved in base MATLAB (Simulink not installed on this machine)';
     const secs = (r.timing.desSec + r.timing.flowSec).toFixed(2);
     setEngine(r.engine, `${engineLabel} · both models ran in ${secs} s`);
 
