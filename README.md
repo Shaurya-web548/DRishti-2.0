@@ -263,6 +263,26 @@ Open <http://localhost:5000>:
 `/simulink?preset=growth` opens straight into the 150,000-patient scenario,
 which is handy for a demo. The other presets are `minimum` and `slow`.
 
+### 5. Put it on a public link (demos)
+
+```powershell
+.un-public.ps1
+```
+
+This starts a production server (waitress, debug off) on `127.0.0.1` and
+opens a Cloudflare quick tunnel, then prints a public `https://…trycloudflare.com`
+link. Keep the window open; Ctrl+C takes the site offline and stops MATLAB.
+
+- The link changes every time the script starts, and only works while this
+  machine is on and the script is running.
+- Visitors are rate-limited (10 scans, 30 reports and 120 simulations per
+  10 minutes each) and uploaded photographs are deleted after 24 hours.
+  Tune with `SCAN_LIMIT`, `REPORT_LIMIT`, `SIMULATE_LIMIT` and
+  `RESULTS_MAX_AGE_HOURS` in `.env`.
+- Never expose `run-local.ps1`: it runs Flask's debugger, which must not be
+  reachable from the internet.
+- Serving MATLAB results publicly is subject to your MATLAB licence terms.
+
 ---
 
 ## Using the MATLAB pipeline directly

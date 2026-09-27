@@ -7,6 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
 import app as app_module  # noqa: E402
+from ratelimit import RateLimiter  # noqa: E402
 
 
 class FakeBridge:
@@ -37,3 +38,11 @@ def client():
     app_module.app.config["TESTING"] = True
     with app_module.app.test_client() as c:
         yield c
+
+
+@pytest.fixture(autouse=True)
+def fresh_limiters(monkeypatch):
+    """Every test starts with roomy, empty limiters so limits never leak
+    between tests. Tests that exercise a limit install their own."""
+    for name in ("SCAN_LIMITER", "REPORT_LIMITER", "SIMULATE_LIMITER"):
+        monkeypatch.setattr(app_module, name, RateLimiter(1000, 600))

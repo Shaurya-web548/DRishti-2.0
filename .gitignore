@@ -34,3 +34,7 @@ Thumbs.db
 tools/report/node_modules/
 tools/report/out/
 .coverage
+
+# Public deployment
+tools/cloudflared/
+logs/

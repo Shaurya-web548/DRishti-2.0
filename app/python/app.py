@@ -19,6 +19,7 @@ Run:
 Then open http://localhost:5000
 """
 
+import functools
 import logging
 import os
 import uuid
@@ -27,7 +28,9 @@ from flask import (Flask, abort, jsonify, render_template, request,
                    send_file, send_from_directory, url_for)
 
 from matlab_bridge import get_bridge
+from ratelimit import RateLimiter, client_key
 from report_generator import generate_pdf
+from retention import purge_old_results
 from site_content import load_team
 from validation import (ValidationError, is_valid_scan_id, validate_patient,
                         validate_scenario)
@@ -55,6 +58,44 @@ app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB uploads
 # In-memory scan store - fine for a hackathon demo / single-machine kiosk.
 # Swap for a DB if this needs to survive restarts or run multi-worker.
 SCANS = {}
+
+# Uploaded photographs are deleted after this many hours (0 keeps them).
+RESULTS_MAX_AGE_HOURS = float(os.environ.get("RESULTS_MAX_AGE_HOURS", "24"))
+
+# Per-visitor limits, requests per 10 minutes. A scan holds the one MATLAB
+# engine for several seconds, so it gets the tightest limit.
+LIMIT_WINDOW_SECONDS = 600
+SCAN_LIMITER = RateLimiter(int(os.environ.get("SCAN_LIMIT", "10")), LIMIT_WINDOW_SECONDS)
+REPORT_LIMITER = RateLimiter(int(os.environ.get("REPORT_LIMIT", "30")), LIMIT_WINDOW_SECONDS)
+SIMULATE_LIMITER = RateLimiter(int(os.environ.get("SIMULATE_LIMIT", "120")), LIMIT_WINDOW_SECONDS)
+
+
+def rate_limited(limiter_name):
+    """Refuse a visitor with 429 once they exceed the named limiter.
+
+    The limiter is looked up by name at request time, so tests can swap it.
+    """
+    def decorate(view):
+        @functools.wraps(view)
+        def wrapper(*args, **kwargs):
+            allowed, retry_after = globals()[limiter_name].allow(client_key(request))
+            if not allowed:
+                res = jsonify({"error": f"Too many requests. Please wait {retry_after} seconds and try again."})
+                res.status_code = 429
+                res.headers["Retry-After"] = str(retry_after)
+                return res
+            return view(*args, **kwargs)
+        return wrapper
+    return decorate
+
+
+@app.after_request
+def security_headers(response):
+    """Conservative defaults for a site reachable from the internet."""
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return response
 
 
 def _allowed(filename):
@@ -97,7 +138,9 @@ def about():
 # ------------------------------------------------------------------ API
 
 @app.route("/api/scan", methods=["POST"])
+@rate_limited("SCAN_LIMITER")
 def scan():
+    purge_old_results(RESULTS_DIR, RESULTS_MAX_AGE_HOURS, SCANS)
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded."}), 400
     f = request.files["image"]
@@ -154,6 +197,7 @@ def serve_result(scan_id, filename):
 
 
 @app.route("/api/report/<scan_id>")
+@rate_limited("REPORT_LIMITER")
 def report(scan_id):
     if not is_valid_scan_id(scan_id) or scan_id not in SCANS:
         return jsonify({"error": "Unknown scan_id."}), 404
@@ -169,6 +213,7 @@ def report(scan_id):
 
 
 @app.route("/api/simulate", methods=["POST"])
+@rate_limited("SIMULATE_LIMITER")
 def simulate():
     try:
         overrides = validate_scenario(request.get_json(silent=True))
