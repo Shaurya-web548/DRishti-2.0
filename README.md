@@ -294,6 +294,10 @@ that stops MATLAB and marks the website offline.
   as `CLOUDFLARE_TUNNEL_TOKEN`, set `project.liveUrl` in
   `app/python/content/team.json` to the address, and re-run `publish-site.ps1`
   so the website accepts it. The laptop still has to be on.
+  Without the Zero Trust dashboard, create it from PowerShell instead:
+  `tools\cloudflared\cloudflared.exe tunnel login`, then `... tunnel create drishti`,
+  `... tunnel route dns drishti drishti.example.com` and `... tunnel token drishti`
+  (the last one prints the token for `.env`).
 - Never expose `run-local.ps1`: it runs Flask's debugger, which must not be
   reachable from the internet.
 - Serving MATLAB results publicly is subject to your MATLAB licence terms.

@@ -107,8 +107,8 @@ try {
 
     $url = $null
     if ($token) {
-        # Named tunnel: the address is fixed and routed in the Cloudflare
-        # dashboard (Public Hostname -> http://localhost:$Port).
+        # Named tunnel: the address is fixed. --url sends its traffic here;
+        # a tunnel created in the dashboard uses its Public Hostname instead.
         if ($liveUrl -notmatch '^https://[a-z0-9.-]+\.[a-z]{2,}$') {
             throw "CLOUDFLARE_TUNNEL_TOKEN is set, so put the tunnel's address in team.json as project.liveUrl (e.g. https://drishti.example.com)."
         }
@@ -117,7 +117,7 @@ try {
         # does not show up in process listings.
         $env:TUNNEL_TOKEN = $token
         $tunnel = Start-Process -FilePath $cloudflared `
-            -ArgumentList "tunnel", "--no-autoupdate", "run" `
+            -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$Port", "run" `
             -RedirectStandardError $tunnelLog -RedirectStandardOutput "$tunnelLog.out" -WindowStyle Hidden -PassThru
 
         for ($i = 0; $i -lt 60 -and -not $url; $i++) {
