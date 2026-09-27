@@ -1,31 +1,53 @@
 """
 app.py - DRishti Flask backend.
 
-Routes:
-  GET  /                              the scan UI (templates/index.html)
+Pages:
+  GET  /                              animated landing page
+  GET  /scan                          the screening tool
+  GET  /how-it-works                  pipeline walkthrough
+  GET  /simulink                      district capacity model (Simulink flow model + DES)
+  GET  /about                         mission, team, safety and limitations
+
+API:
   POST /api/scan                      upload an image, run the pipeline, return JSON
   GET  /api/report/<scan_id>          generate + download the PDF report
+  POST /api/simulate                  run one capacity scenario, return JSON
   GET  /results/<scan_id>/<filename>  serve generated images (overlay/gradcam/original)
 
 Run:
-    cd python
-    python app.py
+    ..\\..\\run-local.ps1      (from the repo root: .\\run-local.ps1)
 Then open http://localhost:5000
 """
 
+import logging
 import os
 import uuid
 
-from flask import Flask, jsonify, render_template, request, send_file, url_for
+from flask import (Flask, abort, jsonify, render_template, request,
+                   send_file, send_from_directory, url_for)
 
 from matlab_bridge import get_bridge
 from report_generator import generate_pdf
+from site_content import load_team
+from validation import (ValidationError, is_valid_scan_id, validate_patient,
+                        validate_scenario)
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 ALLOWED_EXT = {"png", "jpg", "jpeg"}
 
+GRADE_LABELS = {
+    0: "No apparent retinopathy",
+    1: "Mild non-proliferative DR",
+    2: "Moderate non-proliferative DR",
+    3: "Severe non-proliferative DR",
+    4: "Proliferative DR",
+}
+
 os.makedirs(RESULTS_DIR, exist_ok=True)
+
+log = logging.getLogger("drishti")
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB uploads
@@ -39,10 +61,40 @@ def _allowed(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXT
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+def _first_line(exc: Exception) -> str:
+    """A short, readable reason for the browser; the full error is logged."""
+    text = str(exc).strip()
+    return text.splitlines()[-1] if text else exc.__class__.__name__
 
+
+# ---------------------------------------------------------------- pages
+
+@app.route("/")
+def landing():
+    return render_template("landing.html", page="home")
+
+
+@app.route("/scan")
+def scan_page():
+    return render_template("scan.html", page="scan")
+
+
+@app.route("/how-it-works")
+def how_it_works():
+    return render_template("how_it_works.html", page="how")
+
+
+@app.route("/simulink")
+def simulink_page():
+    return render_template("simulink.html", page="simulink")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html", page="about", team=load_team())
+
+
+# ------------------------------------------------------------------ API
 
 @app.route("/api/scan", methods=["POST"])
 def scan():
@@ -64,8 +116,9 @@ def scan():
     try:
         bridge = get_bridge()
         report = bridge.run_pipeline(image_path, scan_dir)
-    except Exception as exc:
-        return jsonify({"error": f"Pipeline failed: {exc}"}), 500
+    except Exception as exc:                                    # noqa: BLE001
+        log.exception("Pipeline failed for scan %s", scan_id)
+        return jsonify({"error": f"Pipeline failed: {_first_line(exc)}"}), 500
 
     if report.get("mode") == "rejected":
         return jsonify({
@@ -81,7 +134,7 @@ def scan():
         "scan_id": scan_id,
         "mode": report["mode"],
         "grade": grade,
-        "grade_label": _grade_label(grade),
+        "grade_label": GRADE_LABELS.get(grade, "Unknown"),
         "referable": report["decision"].get("referable", grade >= 2),
         "confidence": report.get("confidence"),
         "overlay_url": url_for("serve_result", scan_id=scan_id, filename="lesion_overlay.png") if report.get("overlayPath") else None,
@@ -93,33 +146,42 @@ def scan():
 
 @app.route("/results/<scan_id>/<path:filename>")
 def serve_result(scan_id, filename):
-    return send_file(os.path.join(RESULTS_DIR, scan_id, filename))
+    # send_from_directory refuses paths that escape the folder, and the scan
+    # id check stops '..' or an absolute path from choosing the folder.
+    if not is_valid_scan_id(scan_id):
+        abort(404)
+    return send_from_directory(os.path.join(RESULTS_DIR, scan_id), filename)
 
 
 @app.route("/api/report/<scan_id>")
 def report(scan_id):
-    if scan_id not in SCANS:
+    if not is_valid_scan_id(scan_id) or scan_id not in SCANS:
         return jsonify({"error": "Unknown scan_id."}), 404
-    report_data = SCANS[scan_id]
-    patient_info = {
-        "name": request.args.get("name", "-"),
-        "age": request.args.get("age", "-"),
-        "scan_id": scan_id,
-        "location": request.args.get("location", "-"),
-    }
+    try:
+        patient = validate_patient(request.args)
+    except ValidationError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    patient_info = {**patient, "scan_id": scan_id}
     pdf_path = os.path.join(RESULTS_DIR, scan_id, "report.pdf")
-    generate_pdf(report_data, patient_info, pdf_path)
+    generate_pdf(SCANS[scan_id], patient_info, pdf_path)
     return send_file(pdf_path, as_attachment=True, download_name=f"DRishti_report_{scan_id}.pdf")
 
 
-def _grade_label(grade):
-    return {
-        0: "No apparent retinopathy",
-        1: "Mild non-proliferative DR",
-        2: "Moderate non-proliferative DR",
-        3: "Severe non-proliferative DR",
-        4: "Proliferative DR",
-    }.get(grade, "Unknown")
+@app.route("/api/simulate", methods=["POST"])
+def simulate():
+    try:
+        overrides = validate_scenario(request.get_json(silent=True))
+    except ValidationError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    try:
+        result = get_bridge().run_capacity_scenario(overrides)
+    except Exception as exc:                                    # noqa: BLE001
+        log.exception("Capacity scenario failed: %s", overrides)
+        return jsonify({"error": f"Simulation failed: {_first_line(exc)}"}), 500
+
+    return jsonify(result)
 
 
 if __name__ == "__main__":

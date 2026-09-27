@@ -1,0 +1,17 @@
+{
+  "_readme": "Measurements taken outside MATLAB's scenario runs, with where each came from. Update these if you re-measure on different hardware.",
+  "machine": "Windows 11 laptop, MATLAB R2026a (base MATLAB only: no Image Processing, Deep Learning or Simulink products installed), Python 3.12",
+  "measuredOn": "2026-09-25 to 2026-09-27",
+  "scanColdSeconds": 15,
+  "scanWarmSeconds": 9,
+  "segmentRetinaSecondsBefore": 37.0,
+  "segmentRetinaSecondsAfter": 10.6,
+  "reportJsonMBBefore": 64.8,
+  "scanFolderKBAfter": 276,
+  "compatChecks": 61,
+  "compatFailures": 0,
+  "pytestTests": 55,
+  "pytestFailures": 0,
+  "webLayerCoveragePct": 99,
+  "desSingleRunSeconds": 0.8
+}

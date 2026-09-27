@@ -1,4 +1,20 @@
-# DRishti — Diabetic Retinopathy Screening
+# DRishti 2.0 — Diabetic Retinopathy Screening
+
+> **Version 2.0.** Version 1 lives at [github.com/Shaurya-web548/DRishti](https://github.com/Shaurya-web548/DRishti).
+>
+> New in 2.0:
+> - A five-page web app: animated landing page, screening tool, scroll-driven
+>   "How it works", the **Simulink capacity model** run live in MATLAB, and an
+>   About page with the team.
+> - Runs on **base MATLAB**: a pure-MATLAB layer replaces the Image Processing
+>   Toolbox functions the pipeline needs, and the Simulink block diagram is solved
+>   in base MATLAB when Simulink is not installed.
+> - Four integration bugs fixed so a scan runs end to end, and 33 MB less output per scan.
+> - Patient age validated (0–120) in the browser and on the server; results route
+>   hardened against path traversal.
+> - Full APTOS 2019 used for training by default; Messidor-2 and IDRiD held out.
+> - Tests: 56 pytest tests and 61 image-processing checks; a regenerable project
+>   report in `tools/report/`.
 
 An end-to-end diabetic retinopathy (DR) screening pipeline: a fundus photograph
 goes in, and an ICDR grade (0–4), a referral decision, an annotated lesion
@@ -137,11 +153,25 @@ matlab/
   runDRPipelineProduction.m    Module 5 - the script Flask actually calls
   demoExplainGrading.m         Script  - smoke test with synthetic data
 
+matlab/compat/                 Pure-MATLAB stand-ins for the Image Processing
+                               Toolbox functions, used only when it is missing
+
+capacity-model/
+  drishtiCapacityDES.m         Discrete-event simulation of a district programme
+  buildDRishtiSimulinkModel.m  Builds the Simulink flow model
+  drishtiFlowModel.m           Same block equations, solved in base MATLAB
+  drishtiRunScenario.m         One what-if run: DES + flow model + cross-check
+  drishtiRunScenarioJSON.m     JSON wrapper the web app calls
+
 app/python/
-  app.py                       Flask server (/, /api/scan, /api/report/<id>)
+  app.py                       Flask server: pages + /api/scan, /api/report, /api/simulate
   matlab_bridge.py             Singleton MATLAB Engine wrapper
   report_generator.py          Gemini prose + fpdf2 PDF layout
-  templates/ static/           The scan UI
+  validation.py                Input checks (patient age 0-120, scenario ranges)
+  site_content.py              Loads content/team.json for the About page
+  content/team.json            Team roster - edit this to update the About page
+  templates/ static/           Landing, screening, how-it-works, Simulink, about
+  tests/                       pytest suite (run: python -m pytest tests)
 
 models/
   drClassifier.mat             Demo checkpoint (see "About the checkpoint")
@@ -156,8 +186,13 @@ docs/
 
 **MATLAB** R2021a or newer (Grad-CAM needs R2021a+; `trainnet` needs R2024a+), with:
 
-- Image Processing Toolbox — *required*
-- Deep Learning Toolbox — required for the CNN path
+- Image Processing Toolbox — *recommended*. Without it the pipeline falls back
+  to `matlab/compat/`, a pure-MATLAB implementation of the ~30 toolbox
+  functions the screening path uses, so base MATLAB alone is enough to run a
+  scan. See [matlab/compat/README.md](matlab/compat/README.md)
+- Deep Learning Toolbox — required for the CNN path. Without it every scan runs
+  in `real_no_cnn` mode: rule-based grading and the lesion overlay, but no
+  Grad-CAM and no confidence score
 - Statistics and Machine Learning Toolbox — for `fitglm` / `perfcurve`
 - Computer Vision Toolbox — optional; without it the labelled overlay silently
   drops its text annotations rather than failing
@@ -200,12 +235,33 @@ you to `real_no_cnn` mode, and a missing key falls back to canned report prose.
 
 ### 4. Run
 
+On Windows, from the repository root:
+
+```powershell
+.
+un-local.ps1
+```
+
+It creates `.venv` on first run, installs the dependencies and loads `.env`.
+Or by hand:
+
 ```bash
 cd app/python
 python app.py
 ```
 
-Open <http://localhost:5000>, upload a fundus image, then download the PDF.
+Open <http://localhost:5000>:
+
+| Page | What it is |
+|------|------------|
+| `/` | Animated landing page |
+| `/scan` | Upload a fundus image, get the grade, download the PDF |
+| `/how-it-works` | Scroll-driven walkthrough of the six pipeline stages |
+| `/simulink` | District capacity model, run live in MATLAB |
+| `/about` | Mission, team, data, safety and limitations |
+
+`/simulink?preset=growth` opens straight into the 150,000-patient scenario,
+which is handy for a demo. The other presets are `minimum` and `slow`.
 
 ---
 
@@ -257,15 +313,26 @@ sortIntoGradeFolders('messidor_data.csv', 'IMAGES', 'data', ...
     'image_id', 'adjudicated_dr_grade')
 ```
 
-They all merge into the same 0–4 folders. Then:
+**Train on APTOS 2019 only, and keep the other two out of training.**
+
+| Dataset | Role | Why |
+|---------|------|-----|
+| APTOS 2019 | Training | 3,662 images from Aravind Eye Hospital's Indian screening camps, graded on ICDR 0–4. The closest public match to where DRishti runs, and small enough to train in minutes. |
+| Messidor-2 | External test | Different population and camera. Never trained on, so it measures how the model copes with distribution shift. |
+| IDRiD | Lesion check | Pixel-level masks of microaneurysms, haemorrhages and exudates, for validating `segmentRetina.m`. |
+
+Merging all three into one training pool would leave nothing independent to
+test on. Sort APTOS into `data/0` … `data/4`, the other two into their own
+folders, then:
 
 ```matlab
 model = trainDRClassifier('data', Backbone="efficientnetb0", MaxEpochs=10);
 ```
 
-`trainDRClassifier.m` subsamples to `maxPerClass = 200` images per grade by
-default to fit a ~6 GB GPU. **Raise that for a real training run** — it exists so
-the pipeline can be exercised end to end on modest hardware.
+`MaxPerClass` defaults to `Inf`, so the whole of APTOS is used. The first demo
+checkpoint capped it at 200 images per grade, which threw away about 70% of the
+data. Image datastores stream from disk, so the full set does not need to fit in
+memory. Pass `MaxPerClass=200` only for a quick smoke test.
 
 Then tune the operating point and calibrate:
 

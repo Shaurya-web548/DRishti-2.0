@@ -35,6 +35,35 @@ not depend on those unknowns and should work as-is.
 Copy `runDRPipelineProduction.m` next to your other Module 1-5 `.m` files so
 MATLAB can see all of them on one path.
 
+## 1b. If you do not have the Image Processing Toolbox
+
+The pipeline uses about thirty Image Processing Toolbox functions. Base MATLAB
+ships only `imread`, `imwrite`, `imresize`, `rgb2gray`, `im2double` and
+`ind2rgb`, so without the toolbox `assessImageQuality.m` stops immediately with
+"The Image Processing Toolbox is required."
+
+`matlab/compat/` is a pure-MATLAB implementation of the functions the pipeline
+needs, and `matlab/drishtiSetupCompat.m` puts it on the path **only when the
+real toolbox is missing**. The Flask bridge calls that automatically, so there
+is nothing to configure. On a licensed machine the shims stay off the path and
+MathWorks' own code is used.
+
+To check which route your machine takes:
+
+```matlab
+addpath('path	o\drishti\matlab');
+drishtiSetupCompat(true);
+```
+
+Run the shim self-test with:
+
+```matlab
+drishtiSetupCompat(); testCompat
+```
+
+See `matlab/compat/README.md` for what is implemented and where results can
+differ slightly from the toolbox.
+
 ## 2. Install the MATLAB Engine for Python (one time)
 
 Open a terminal (cmd or PowerShell), then:

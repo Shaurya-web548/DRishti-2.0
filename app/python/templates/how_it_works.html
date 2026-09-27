@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}How it works{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retina.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/how.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">How it works</span>
+    <h1>From one photograph to a referral decision.</h1>
+    <p class="lede">Six stages, each one you can open up and inspect. Scroll, and watch the eye
+       change as each stage does its job.</p>
+  </div>
+</section>
+
+<section class="story wrap" aria-label="The screening pipeline, step by step">
+  <div class="story-visual">
+    <div class="story-sticky">
+      <div class="retina-frame" id="storyRetina"></div>
+      <div class="stage-caption" aria-hidden="true">
+        <span class="stage-num" id="stageNum">01</span>
+        <span class="stage-name" id="stageName">Capture</span>
+      </div>
+      <ol class="progress" id="storyProgress" aria-hidden="true">
+        <li></li><li></li><li></li><li></li><li></li><li></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="story-steps">
+    <article class="story-step" data-stage="capture" data-name="Capture">
+      <span class="step-kicker">01 &middot; Capture</span>
+      <h2>A technician photographs both eyes.</h2>
+      <p>A non-mydriatic fundus camera at the screening camp takes one photograph per eye. No
+         specialist is needed at this point, only a trained operator.</p>
+      <ul class="facts">
+        <li><strong>About 4 min</strong> per patient, both eyes</li>
+        <li><strong>Up to 2 retakes</strong> if the quality gate says no</li>
+      </ul>
+    </article>
+
+    <article class="story-step" data-stage="quality" data-name="Quality gate">
+      <span class="step-kicker">02 &middot; Quality gate</span>
+      <h2>Can this photograph be graded at all?</h2>
+      <p>Before any grading, three checks run on the image. The field of view is found with a
+         circular Hough transform. Sharpness is the variance of the Laplacian of the green channel.
+         Exposure comes from the brightness histogram inside the retina.</p>
+      <div class="verdicts" aria-label="Possible outcomes">
+        <span class="v pass">Pass</span>
+        <span class="v enh">Enhance with CLAHE</span>
+        <span class="v rej">Reject &rarr; retake</span>
+      </div>
+      <p class="why">A rejected image never travels. That saves bandwidth, and it means a grade is
+         never guessed from a photo that cannot support one.</p>
+      <code class="src">assessImageQuality.m</code>
+    </article>
+
+    <article class="story-step" data-stage="segment" data-name="Segmentation">
+      <span class="step-kicker">03 &middot; Segmentation</span>
+      <h2>Finding the anatomy first.</h2>
+      <p>The optic disc is the brightest compact region. The fovea is the darkest area about
+         two and a half disc diameters to its side. Vessels come from 24 matched filters, at two widths and
+         twelve orientations, followed by hysteresis thresholding.</p>
+      <p class="why">Every threshold is a fraction of the retina&rsquo;s own radius, so the same
+         settings work across cameras and resolutions without retuning.</p>
+      <code class="src">segmentRetina.m</code>
+    </article>
+
+    <article class="story-step" data-stage="grade" data-name="Lesions">
+      <span class="step-kicker">04 &middot; Lesions</span>
+      <h2>Counting what damages the retina.</h2>
+      <ul class="lesion-list">
+        <li><span class="sw ma"></span><div><strong>Microaneurysms</strong> Tiny red dots, isolated with a top-hat transform.</div></li>
+        <li><span class="sw ex"></span><div><strong>Hard exudates</strong> Bright yellow deposits, found against a median-filtered background.</div></li>
+        <li><span class="sw hem"></span><div><strong>Haemorrhages</strong> Dark blots away from the vessels, kept only if their shape is blob-like.</div></li>
+      </ul>
+      <p class="why">Lesions are counted per quadrant around the optic disc, because the severe
+         grade depends on where they are, not only how many.</p>
+    </article>
+
+    <article class="story-step" data-stage="consensus" data-name="Two graders">
+      <span class="step-kicker">05 &middot; Two graders</span>
+      <h2>Two independent opinions, one decision.</h2>
+      <div class="graders">
+        <div class="grader">
+          <h3>Clinical rules</h3>
+          <p>Applies the ICDR scale directly to the lesion counts, including the 4-2-1 rule for
+             severe disease. Every grade lists the criteria that triggered it.</p>
+          <code class="src">gradeByRules.m</code>
+        </div>
+        <div class="grader">
+          <h3>Neural network</h3>
+          <p>EfficientNet-B0 fine-tuned on APTOS 2019. Its confidence is calibrated, and its
+             referral cut-off is chosen for at least 90% sensitivity.</p>
+          <code class="src">predictDRGrade.m</code>
+        </div>
+      </div>
+      <div class="consensus-rule">
+        <span><strong>Agree</strong> &rarr; the grade stands</span>
+        <span><strong>Disagree</strong> &rarr; a human reviews, and the case is referable if either grader says so</span>
+      </div>
+    </article>
+
+    <article class="story-step" data-stage="report" data-name="Report">
+      <span class="step-kicker">06 &middot; Report</span>
+      <h2>A result the clinic and the patient can read.</h2>
+      <p>The clinic gets the grade, the referral decision, a colour-coded lesion overlay and, when
+         the network ran, a Grad-CAM map of where it looked. The patient gets a PDF in plain
+         language.</p>
+      <p class="why">A language model writes the plain-language paragraphs and nothing else. The
+         grade is a fixed input it cannot change. Without a key or a network, a built-in paragraph
+         is used and the report still generates.</p>
+      <code class="src">report_generator.py</code>
+    </article>
+  </div>
+</section>
+
+<!-- ======================================================= resilience -->
+<section class="section resilience">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal">Designed for real camps</span>
+      <h2 class="reveal" style="--delay:.06s">It degrades instead of failing.</h2>
+      <p class="lede reveal" style="--delay:.12s">Each missing piece removes one capability. The
+         screening keeps running.</p>
+    </div>
+
+    <div class="ladder">
+      <div class="rung reveal" style="--delay:.00s">
+        <span class="rung-if">No trained network</span>
+        <span class="rung-then">Rule-based grading and the lesion overlay still run. The report says which mode was used.</span>
+      </div>
+      <div class="rung reveal" style="--delay:.08s">
+        <span class="rung-if">No Image Processing Toolbox</span>
+        <span class="rung-then">A pure-MATLAB layer supplies every image function the pipeline needs, checked by 61 tests.</span>
+      </div>
+      <div class="rung reveal" style="--delay:.16s">
+        <span class="rung-if">No language-model key</span>
+        <span class="rung-then">The PDF uses a built-in, clinically neutral paragraph instead.</span>
+      </div>
+      <div class="rung reveal" style="--delay:.24s">
+        <span class="rung-if">No network at the camp</span>
+        <span class="rung-then">Images are stored and forwarded when the link returns.</span>
+      </div>
+    </div>
+
+    <div class="modes reveal">
+      <div class="mode">
+        <span class="mode-tag full">real_full</span>
+        <p>A trained network loads. Consensus grade, Grad-CAM, calibrated confidence and the lesion overlay.</p>
+      </div>
+      <div class="mode">
+        <span class="mode-tag rules">real_no_cnn</span>
+        <p>No usable network. Rule-based ICDR grade and the lesion overlay. No Grad-CAM, no confidence score.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= next -->
+<section class="section section-dark next-up">
+  <div class="wrap next-grid">
+    <div>
+      <span class="eyebrow reveal" style="color:var(--amber-2)">The bigger picture</span>
+      <h2 class="reveal" style="--delay:.06s">One eye is solved. What about a hundred thousand?</h2>
+      <p class="lede reveal" style="--delay:.12s">A screening programme is a chain of queues, and
+         it breaks at the narrowest one. Our Simulink model finds it.</p>
+    </div>
+    <div class="next-actions reveal" style="--delay:.18s">
+      <a class="btn btn-feature" href="{{ url_for('simulink_page') }}">Open the Simulink model <span class="feature-tag">Major feature</span></a>
+      <a class="btn btn-ghost" href="{{ url_for('scan_page') }}">Try a screening</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/retina.js') }}"></script>
+<script src="{{ url_for('static', filename='js/how.js') }}"></script>
+{% endblock %}

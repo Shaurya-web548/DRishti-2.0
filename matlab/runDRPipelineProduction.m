@@ -59,14 +59,24 @@ if isfield(qc, 'status') && strcmpi(qc.status, 'reject')
     report.error = 'Image quality too low for grading (blur/exposure/field-of-view failure).';
     jsonPath = fullfile(options.OutputDir, 'report.json');
     fid = fopen(jsonPath, 'w');
-    fwrite(fid, jsonencode(report, PrettyPrint = true));
+    fwrite(fid, jsonencode(stripHeavyFields(report), PrettyPrint = true));
     fclose(fid);
     report.jsonPath = jsonPath;
     return
 end
 
-if isfield(qc, 'status') && strcmpi(qc.status, 'enhanced') && isfield(qc, 'image') && ~isempty(qc.image)
-    workingImage = qc.image;   % use the CLAHE+denoise output for grading
+% Resolved: assessImageQuality returns the enhanced copy as
+% .processedImage, not .image. Checking only for .image meant the CLAHE
+% output was computed and then silently discarded, and a borderline image
+% was graded from the raw file after all.
+enhanced = [];
+if isfield(qc, 'image'),          enhanced = qc.image;          end
+if isempty(enhanced) && isfield(qc, 'processedImage')
+    enhanced = qc.processedImage;
+end
+
+if isfield(qc, 'status') && strcmpi(qc.status, 'enhanced') && ~isempty(enhanced)
+    workingImage = enhanced;   % use the CLAHE+denoise output for grading
 else
     workingImage = imagePath;
 end
@@ -172,17 +182,32 @@ else
         'grade', ruleGrade, ...
         'referable', ruleGrade >= 2, ...
         'ruleInfo', ruleInfo, ...
-        'lesionCounts', seg.lesionCounts, ...
+        'lesionCounts', ruleInfo.counts, ...
         'overlayPath', overlayPath);
-    % %%ASSUME seg.lesionCounts is the quadrant lesion-count struct that
-    % Module 3's rule path and CNN path both rely on.
+    % Resolved: segmentRetina returns masks and per-lesion structs, not a
+    % counts struct. gradeByRules is what bins lesions into quadrants, and it
+    % hands the result back as details.counts, so that is the quadrant
+    % lesion-count struct the report wants.
 end
 
 %% ---- Step 5: Persist JSON for the Python/Flask layer -------------------
 jsonPath = fullfile(options.OutputDir, 'report.json');
 fid = fopen(jsonPath, 'w');
-fwrite(fid, jsonencode(report, PrettyPrint = true));
+fwrite(fid, jsonencode(stripHeavyFields(report), PrettyPrint = true));
 fclose(fid);
 report.jsonPath = jsonPath;
 
+end
+
+function r = stripHeavyFields(r)
+%STRIPHEAVYFIELDS  Drop the full-resolution image arrays before serialising.
+%
+%   jsonencode writes a pixel array out as nested JSON numbers, so leaving
+%   the quality gate's processed image in turns a small report into tens of
+%   megabytes per scan. Nothing downstream reads it - Flask and the PDF
+%   generator use the PNGs written beside the report - so it is dropped here
+%   rather than being carried through the JSON.
+if isfield(r, 'quality') && isstruct(r.quality) && isfield(r.quality, 'processedImage')
+    r.quality = rmfield(r.quality, 'processedImage');
+end
 end

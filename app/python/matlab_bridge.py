@@ -30,6 +30,13 @@ MATLAB_SRC_DIR = os.environ.get(
 )
 MODEL_PATH = os.environ.get("DR_MODEL_PATH", "drClassifier.mat")
 
+# The district capacity model (discrete-event simulation + Simulink flow
+# model) lives beside the app, one level above app/.
+CAPACITY_DIR = os.environ.get(
+    "CAPACITY_MODEL_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "capacity-model")),
+)
+
 
 class MatlabBridge:
     _instance = None
@@ -47,8 +54,23 @@ class MatlabBridge:
         print("[matlab_bridge] Starting MATLAB engine (this can take 20-30s)...")
         self.eng = matlab.engine.start_matlab()
         self.eng.addpath(MATLAB_SRC_DIR, nargout=0)
+        if os.path.isdir(CAPACITY_DIR):
+            self.eng.addpath(CAPACITY_DIR, nargout=0)
+
+        # Base MATLAB ships almost none of the Image Processing Toolbox. When
+        # the toolbox is missing this puts the pure-MATLAB shims in
+        # matlab/compat on the path; when it is present it is left alone, so a
+        # licensed machine keeps using MathWorks' own implementations.
+        try:
+            self.using_compat = bool(self.eng.drishtiSetupCompat(True, nargout=1))
+        except Exception as exc:                      # noqa: BLE001
+            self.using_compat = False
+            print(f"[matlab_bridge] Could not set up the image-processing compat layer: {exc}")
+
         self.call_lock = threading.Lock()  # MATLAB Engine calls aren't thread-safe
         print(f"[matlab_bridge] Ready. MATLAB source dir: {MATLAB_SRC_DIR}")
+        if self.using_compat:
+            print("[matlab_bridge] Image Processing Toolbox absent - using matlab/compat shims.")
         atexit.register(self.shutdown)
 
     def run_pipeline(self, image_path: str, output_dir: str) -> dict:
@@ -73,6 +95,17 @@ class MatlabBridge:
         json_path = os.path.join(output_dir, "report.json")
         with open(json_path, "r") as f:
             return json.load(f)
+
+    def run_capacity_scenario(self, overrides: dict) -> dict:
+        """Run one what-if scenario through the district capacity model.
+
+        overrides is a dict of already-validated parameters. It crosses the
+        engine boundary as a JSON string and the result comes back the same
+        way, which avoids converting nested MATLAB structs into Python.
+        """
+        with self.call_lock:
+            raw = self.eng.drishtiRunScenarioJSON(json.dumps(overrides), nargout=1)
+        return json.loads(raw)
 
     def shutdown(self):
         try:

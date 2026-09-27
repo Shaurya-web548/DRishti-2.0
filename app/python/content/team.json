@@ -1,0 +1,65 @@
+{
+  "_readme": "Edit this one file to update the team everywhere: the About page reads it on every request, and tools/report/build_report.js reads it when generating the project report. Links must start with https:// (anything else is dropped for safety).",
+  "project": {
+    "name": "DRishti",
+    "tagline": "Diabetic retinopathy screening that a district can actually run",
+    "event": "Smart India Hackathon",
+    "problemStatement": "SIH26038",
+    "institution": "",
+    "repository": "https://github.com/Shaurya-web548/DRishti-2.0",
+    "previousVersion": "https://github.com/Shaurya-web548/DRishti",
+    "projectPage": "https://shaurya-web548.github.io/DRishti/"
+  },
+  "mentors": [
+    {
+      "name": "",
+      "role": "Faculty mentor",
+      "affiliation": "",
+      "pending": true
+    }
+  ],
+  "members": [
+    {
+      "name": "Shaurya Agarwal",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/Shaurya-web548",
+      "linkedin": "https://www.linkedin.com/in/shaurya-agarwal-aa268127a",
+      "pending": false
+    },
+    {
+      "name": "Aditya Raj",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/ADITYARAJ716",
+      "linkedin": "https://www.linkedin.com/in/aditya-raj-b52584364",
+      "pending": false
+    },
+    {
+      "name": "Ishaan Dubey",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/ishaancodes007",
+      "linkedin": "https://www.linkedin.com/in/ishaan-dubey-74826636a",
+      "pending": false
+    },
+    {
+      "name": "Kavyansh Prabhakar",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/prabhakarkavyansh",
+      "linkedin": "https://www.linkedin.com/in/kavyansh-prabhakar-a54ba4331",
+      "pending": false
+    },
+    {
+      "name": "Deepak Kumar Singh",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/defcq",
+      "linkedin": "https://www.linkedin.com/in/deepak-kumar-singh-643b74307",
+      "pending": false
+    },
+    {
+      "name": "Meehika Singh",
+      "role": "", "focus": "", "program": "", "email": "",
+      "github": "https://github.com/meehikasingh",
+      "linkedin": "https://www.linkedin.com/in/meehika-singh-7a8a1643a",
+      "pending": false
+    }
+  ]
+}

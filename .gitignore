@@ -29,3 +29,8 @@ train_images/
 # OS
 .DS_Store
 Thumbs.db
+
+# Report tooling
+tools/report/node_modules/
+tools/report/out/
+.coverage

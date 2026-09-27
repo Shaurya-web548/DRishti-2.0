@@ -42,8 +42,8 @@ EX   = quadrantCounts(pick(B, {'exudates', 'hardExudates', 'exudateMask'}), odc)
 CWS  = quadrantCounts(pick(B, {'cottonWoolSpots', 'softExudates'}), odc);
 VB   = quadrantCounts(pick(B, {'venousBeading'}), odc) > 0;
 IRMA = quadrantCounts(pick(B, {'irma', 'IRMA'}), odc) > 0;
-NV   = any(pick(B, {'neovascularization', 'neovascularisation'}), 'all');
-VH   = any(pick(B, {'vitreousHemorrhage', 'preretinalHemorrhage'}), 'all');
+NV   = presenceFlag(pick(B, {'neovascularization', 'neovascularisation'}));
+VH   = presenceFlag(pick(B, {'vitreousHemorrhage', 'preretinalHemorrhage'}));
 
 found = {};
 if any(HEM),  found{end+1} = sprintf('%d hemorrhage(s)', sum(HEM));                    end
@@ -93,6 +93,35 @@ function v = pick(s, names)
 v = [];
 for k = 1:numel(names)
     if isfield(s, names{k}), v = s.(names{k}); return; end
+end
+end
+
+function tf = presenceFlag(item)
+%PRESENCEFLAG  Is this finding present at all?
+%
+%   segmentRetina returns neovascularisation as a struct (nvdMask, nveMask,
+%   scores and a 'found' flag), not as a bare mask, so unwrap it the same way
+%   quadrantCounts unwraps its lesion structs before asking the question.
+tf = false;
+if isempty(item), return; end
+
+if isstruct(item)
+    if isfield(item, 'found')
+        tf = logical(item.found);
+        return
+    end
+    masks = {'mask', 'nvdMask', 'nveMask'};
+    for k = 1:numel(masks)
+        if isfield(item, masks{k}) && any(item.(masks{k})(:))
+            tf = true;
+            return
+        end
+    end
+    return
+end
+
+if isnumeric(item) || islogical(item)
+    tf = any(item(:));
 end
 end
 

@@ -1,0 +1,1412 @@
+{
+  "generated": "2026-09-27 14:35",
+  "matlabRelease": "2026a",
+  "baseline": {
+    "engine": "matlab",
+    "params": {
+      "annualPatients": 100000,
+      "sites": 8,
+      "workers": 2,
+      "procMeanSec": 11,
+      "graderFTE": 2,
+      "ophthFTE": 1,
+      "uplinkMbps": 4,
+      "pReferable": 0.07,
+      "pDisagree": 0.22,
+      "workingDays": 250,
+      "sessionHours": 6
+    },
+    "des": {
+      "patientsScreened": 96879,
+      "unmetDemandPct": 2.0920711504389344,
+      "ungradableRatePct": 0.95285806299904918,
+      "imagesUploaded": 190180,
+      "gbPerYear": 650.029296875,
+      "autoMedianMin": 0.42706114512384374,
+      "autoP95Min": 0.61370743966517682,
+      "sameSessionPct": 100,
+      "turnaroundP95H": 0.08374313075087228,
+      "withinSlaPct": 100,
+      "humanTouchRatePct": 29.733998080079274,
+      "casesToHuman": 28806,
+      "referableCases": 6742,
+      "referralP95WaitDays": 0,
+      "referralMaxBacklog": 5,
+      "computeP95WaitMin": 0.10994360047834556,
+      "computeUtil24hPct": 4.8873275719109355
+    },
+    "utilisation": [
+      {
+        "key": "technician",
+        "label": "Technician",
+        "pct": 61.265475233509115,
+        "basis": "of session hours"
+      },
+      {
+        "key": "uplink",
+        "label": "Site uplink",
+        "pct": 3.0816203703703704,
+        "basis": "of session hours"
+      },
+      {
+        "key": "compute",
+        "label": "Compute workers",
+        "pct": 19.549310287643742,
+        "basis": "of session hours"
+      },
+      {
+        "key": "grader",
+        "label": "Graders",
+        "pct": 26.931596148169294,
+        "basis": "of shift hours"
+      },
+      {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 74.911111111111111,
+        "basis": "of appointment slots"
+      }
+    ],
+    "bottleneck": {
+      "key": "ophthalmologist",
+      "label": "Ophthalmologist",
+      "pct": 74.911111111111111,
+      "basis": "of appointment slots"
+    },
+    "validation": [
+      {
+        "quantity": "Patients screened",
+        "flow": 100000,
+        "des": 96879,
+        "diffPct": 3.2
+      },
+      {
+        "quantity": "Images uploaded",
+        "flow": 194472,
+        "des": 190180,
+        "diffPct": 2.3
+      },
+      {
+        "quantity": "Images processed",
+        "flow": 194472,
+        "des": 190180,
+        "diffPct": 2.3
+      },
+      {
+        "quantity": "Human review cases",
+        "flow": 29800,
+        "des": 28806,
+        "diffPct": 3.5
+      },
+      {
+        "quantity": "Referrals",
+        "flow": 7000,
+        "des": 6742,
+        "diffPct": 3.8
+      }
+    ],
+    "flowTotal": [
+      100000.00000000156,
+      194472.25599999374,
+      194472.25599999374,
+      29799.999999998934,
+      7000.0000000001355
+    ],
+    "referralBacklogEndOfYear": 0,
+    "timing": {
+      "desSec": 0.3252412,
+      "flowSec": 0.030258
+    }
+  },
+  "growth": {
+    "engine": "matlab",
+    "params": {
+      "annualPatients": 150000,
+      "sites": 8,
+      "workers": 2,
+      "procMeanSec": 11,
+      "graderFTE": 2,
+      "ophthFTE": 1,
+      "uplinkMbps": 4,
+      "pReferable": 0.07,
+      "pDisagree": 0.22,
+      "workingDays": 250,
+      "sessionHours": 6
+    },
+    "des": {
+      "patientsScreened": 136245,
+      "unmetDemandPct": 8.350551193697596,
+      "ungradableRatePct": 0.919212560632395,
+      "imagesUploaded": 267503,
+      "gbPerYear": 914.31689453125,
+      "autoMedianMin": 0.43538512676605023,
+      "autoP95Min": 0.65462300252147532,
+      "sameSessionPct": 100,
+      "turnaroundP95H": 0.096536701021432123,
+      "withinSlaPct": 100,
+      "humanTouchRatePct": 29.647326507394766,
+      "casesToHuman": 40393,
+      "referableCases": 9730,
+      "referralP95WaitDays": 19,
+      "referralMaxBacklog": 731,
+      "computeP95WaitMin": 0.15333286782333744,
+      "computeUtil24hPct": 6.8693917284559429
+    },
+    "utilisation": [
+      {
+        "key": "technician",
+        "label": "Technician",
+        "pct": 86.433143479496721,
+        "basis": "of session hours"
+      },
+      {
+        "key": "uplink",
+        "label": "Site uplink",
+        "pct": 4.334539351851852,
+        "basis": "of session hours"
+      },
+      {
+        "key": "compute",
+        "label": "Compute workers",
+        "pct": 27.477566913823772,
+        "basis": "of session hours"
+      },
+      {
+        "key": "grader",
+        "label": "Graders",
+        "pct": 37.735465657740164,
+        "basis": "of shift hours"
+      },
+      {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 108.11111111111111,
+        "basis": "of appointment slots"
+      }
+    ],
+    "bottleneck": {
+      "key": "ophthalmologist",
+      "label": "Ophthalmologist",
+      "pct": 108.11111111111111,
+      "basis": "of appointment slots"
+    },
+    "validation": [
+      {
+        "quantity": "Patients screened",
+        "flow": 150000,
+        "des": 136245,
+        "diffPct": 10.1
+      },
+      {
+        "quantity": "Images uploaded",
+        "flow": 291708,
+        "des": 267503,
+        "diffPct": 9
+      },
+      {
+        "quantity": "Images processed",
+        "flow": 291708,
+        "des": 267503,
+        "diffPct": 9
+      },
+      {
+        "quantity": "Human review cases",
+        "flow": 44700,
+        "des": 40393,
+        "diffPct": 10.7
+      },
+      {
+        "quantity": "Referrals",
+        "flow": 9000,
+        "des": 9730,
+        "diffPct": -7.5
+      }
+    ],
+    "flowTotal": [
+      150000,
+      291708.38400000037,
+      291708.38400000037,
+      44700.000000000604,
+      9000
+    ],
+    "referralBacklogEndOfYear": 1500,
+    "timing": {
+      "desSec": 0.3000661,
+      "flowSec": 0.0118186
+    }
+  },
+  "minimum": {
+    "engine": "matlab",
+    "params": {
+      "annualPatients": 100000,
+      "sites": 10,
+      "workers": 1,
+      "procMeanSec": 11,
+      "graderFTE": 1,
+      "ophthFTE": 1,
+      "uplinkMbps": 4,
+      "pReferable": 0.07,
+      "pDisagree": 0.22,
+      "workingDays": 250,
+      "sessionHours": 6
+    },
+    "des": {
+      "patientsScreened": 97450,
+      "unmetDemandPct": 1.326741410778395,
+      "ungradableRatePct": 0.96041465521622038,
+      "imagesUploaded": 191299,
+      "gbPerYear": 653.85400390625,
+      "autoMedianMin": 0.55053267059406608,
+      "autoP95Min": 1.1204935594478231,
+      "sameSessionPct": 100,
+      "turnaroundP95H": 0.24998897296343334,
+      "withinSlaPct": 100,
+      "humanTouchRatePct": 29.692149820420727,
+      "casesToHuman": 28935,
+      "referableCases": 6800,
+      "referralP95WaitDays": 0,
+      "referralMaxBacklog": 3,
+      "computeP95WaitMin": 0.61535412605826423,
+      "computeUtil24hPct": 9.827914174669635
+    },
+    "utilisation": [
+      {
+        "key": "technician",
+        "label": "Technician",
+        "pct": 49.643674669479111,
+        "basis": "of session hours"
+      },
+      {
+        "key": "uplink",
+        "label": "Site uplink",
+        "pct": 2.4798018518518523,
+        "basis": "of session hours"
+      },
+      {
+        "key": "compute",
+        "label": "Compute workers",
+        "pct": 39.31165669867854,
+        "basis": "of session hours"
+      },
+      {
+        "key": "grader",
+        "label": "Graders",
+        "pct": 54.170876881740142,
+        "basis": "of shift hours"
+      },
+      {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 75.555555555555557,
+        "basis": "of appointment slots"
+      }
+    ],
+    "bottleneck": {
+      "key": "ophthalmologist",
+      "label": "Ophthalmologist",
+      "pct": 75.555555555555557,
+      "basis": "of appointment slots"
+    },
+    "validation": [
+      {
+        "quantity": "Patients screened",
+        "flow": 100000,
+        "des": 97450,
+        "diffPct": 2.6
+      },
+      {
+        "quantity": "Images uploaded",
+        "flow": 194472,
+        "des": 191299,
+        "diffPct": 1.7
+      },
+      {
+        "quantity": "Images processed",
+        "flow": 194472,
+        "des": 191299,
+        "diffPct": 1.7
+      },
+      {
+        "quantity": "Human review cases",
+        "flow": 29800,
+        "des": 28935,
+        "diffPct": 3
+      },
+      {
+        "quantity": "Referrals",
+        "flow": 7000,
+        "des": 6800,
+        "diffPct": 2.9
+      }
+    ],
+    "flowTotal": [
+      100000.00000000156,
+      194472.25599999374,
+      194472.25599999374,
+      29799.999999998934,
+      7000.0000000001355
+    ],
+    "referralBacklogEndOfYear": 0,
+    "timing": {
+      "desSec": 0.2265535,
+      "flowSec": 0.0089203
+    }
+  },
+  "volumeSweep": [
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 50000,
+        "sites": 8,
+        "workers": 2,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 49117,
+        "unmetDemandPct": 0.56946923061498667,
+        "ungradableRatePct": 0.94782906810252687,
+        "imagesUploaded": 96390,
+        "gbPerYear": 329.4580078125,
+        "autoMedianMin": 0.41829782932836679,
+        "autoP95Min": 0.57257386648416275,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.0758853283665303,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.6862593399434,
+        "casesToHuman": 14581,
+        "referableCases": 3388,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 0,
+        "computeP95WaitMin": 0.049558489202581942,
+        "computeUtil24hPct": 2.4772956729667612
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 31.110281555961766,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 1.561875,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 9.9091826918670449,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 13.562568097936252,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 37.644444444444446,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 37.644444444444446,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 50000,
+          "des": 49117,
+          "diffPct": 1.8
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 97236,
+          "des": 96390,
+          "diffPct": 0.9
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 97236,
+          "des": 96390,
+          "diffPct": 0.9
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 14900,
+          "des": 14581,
+          "diffPct": 2.2
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 3500,
+          "des": 3388,
+          "diffPct": 3.3
+        }
+      ],
+      "flowTotal": [
+        50000.000000000779,
+        97236.127999996868,
+        97236.127999996868,
+        14899.999999999467,
+        3500.0000000000678
+      ],
+      "referralBacklogEndOfYear": 0,
+      "timing": {
+        "desSec": 0.1043925,
+        "flowSec": 0.0080366
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 100000,
+        "sites": 8,
+        "workers": 2,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 96879,
+        "unmetDemandPct": 2.0920711504389344,
+        "ungradableRatePct": 0.95285806299904918,
+        "imagesUploaded": 190180,
+        "gbPerYear": 650.029296875,
+        "autoMedianMin": 0.42706114512384374,
+        "autoP95Min": 0.61370743966517682,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.08374313075087228,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.733998080079274,
+        "casesToHuman": 28806,
+        "referableCases": 6742,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 5,
+        "computeP95WaitMin": 0.10994360047834556,
+        "computeUtil24hPct": 4.8873275719109355
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 61.265475233509115,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 3.0816203703703704,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 19.549310287643742,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 26.931596148169294,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 74.911111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 74.911111111111111,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 100000,
+          "des": 96879,
+          "diffPct": 3.2
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 29800,
+          "des": 28806,
+          "diffPct": 3.5
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 7000,
+          "des": 6742,
+          "diffPct": 3.8
+        }
+      ],
+      "flowTotal": [
+        100000.00000000156,
+        194472.25599999374,
+        194472.25599999374,
+        29799.999999998934,
+        7000.0000000001355
+      ],
+      "referralBacklogEndOfYear": 0,
+      "timing": {
+        "desSec": 0.223422,
+        "flowSec": 0.0134888
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 150000,
+        "sites": 8,
+        "workers": 2,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 136245,
+        "unmetDemandPct": 8.350551193697596,
+        "ungradableRatePct": 0.919212560632395,
+        "imagesUploaded": 267503,
+        "gbPerYear": 914.31689453125,
+        "autoMedianMin": 0.43538512676605023,
+        "autoP95Min": 0.65462300252147532,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.096536701021432123,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.647326507394766,
+        "casesToHuman": 40393,
+        "referableCases": 9730,
+        "referralP95WaitDays": 19,
+        "referralMaxBacklog": 731,
+        "computeP95WaitMin": 0.15333286782333744,
+        "computeUtil24hPct": 6.8693917284559429
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 86.433143479496721,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 4.334539351851852,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 27.477566913823772,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 37.735465657740164,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 108.11111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 108.11111111111111,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 150000,
+          "des": 136245,
+          "diffPct": 10.1
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 291708,
+          "des": 267503,
+          "diffPct": 9
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 291708,
+          "des": 267503,
+          "diffPct": 9
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 44700,
+          "des": 40393,
+          "diffPct": 10.7
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 9000,
+          "des": 9730,
+          "diffPct": -7.5
+        }
+      ],
+      "flowTotal": [
+        150000,
+        291708.38400000037,
+        291708.38400000037,
+        44700.000000000604,
+        9000
+      ],
+      "referralBacklogEndOfYear": 1500,
+      "timing": {
+        "desSec": 0.2720742,
+        "flowSec": 0.0072384
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 200000,
+        "sites": 8,
+        "workers": 2,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 151885,
+        "unmetDemandPct": 23.194192559341904,
+        "ungradableRatePct": 0.92884305552837731,
+        "imagesUploaded": 298065,
+        "gbPerYear": 1018.77685546875,
+        "autoMedianMin": 0.43957342861176585,
+        "autoP95Min": 0.673876682420996,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.10524585833627491,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.837706159265235,
+        "casesToHuman": 45319,
+        "referableCases": 10581,
+        "referralP95WaitDays": 42,
+        "referralMaxBacklog": 1581,
+        "computeP95WaitMin": 0.17390319972764687,
+        "computeUtil24hPct": 7.6536023971518405
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 96.811606557592228,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 4.829756944444445,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 30.614409588607362,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 42.330894752189757,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 117.56666666666666,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 117.56666666666666,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 161394,
+          "des": 151885,
+          "diffPct": 6.3
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 313866,
+          "des": 298065,
+          "diffPct": 5.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 313866,
+          "des": 298065,
+          "diffPct": 5.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 48095,
+          "des": 45319,
+          "diffPct": 6.1
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 9000,
+          "des": 10581,
+          "diffPct": -14.9
+        }
+      ],
+      "flowTotal": [
+        161393.86918488893,
+        313866.2984495454,
+        313866.2984495454,
+        48095.373017095728,
+        9000
+      ],
+      "referralBacklogEndOfYear": 2297.57,
+      "timing": {
+        "desSec": 0.3089808,
+        "flowSec": 0.0073445
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 300000,
+        "sites": 8,
+        "workers": 2,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 156235,
+        "unmetDemandPct": 47.36527765265641,
+        "ungradableRatePct": 0.961008171105096,
+        "imagesUploaded": 306734,
+        "gbPerYear": 1048.4072265625,
+        "autoMedianMin": 0.44094619619500008,
+        "autoP95Min": 0.67837869326831413,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.10822920333480375,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.750056005376518,
+        "casesToHuman": 46480,
+        "referableCases": 10967,
+        "referralP95WaitDays": 52,
+        "referralMaxBacklog": 1967,
+        "computeP95WaitMin": 0.17967623024378548,
+        "computeUtil24hPct": 7.8744705955682459
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 99.81454828627308,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 4.9702268518518524,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 31.497882382272984,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 43.466203658106295,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 121.85555555555555,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 121.85555555555555,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 161394,
+          "des": 156235,
+          "diffPct": 3.3
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 313866,
+          "des": 306734,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 313866,
+          "des": 306734,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 48095,
+          "des": 46480,
+          "diffPct": 3.5
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 9000,
+          "des": 10967,
+          "diffPct": -17.9
+        }
+      ],
+      "flowTotal": [
+        161393.86918488893,
+        313866.2984495454,
+        313866.2984495454,
+        48095.373017095728,
+        9000
+      ],
+      "referralBacklogEndOfYear": 2297.57,
+      "timing": {
+        "desSec": 0.3189824,
+        "flowSec": 0.0072726
+      }
+    }
+  ],
+  "computeSweep": [
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 100000,
+        "sites": 8,
+        "workers": 1,
+        "procMeanSec": 11,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 96879,
+        "unmetDemandPct": 2.0920711504389344,
+        "ungradableRatePct": 0.95285806299904918,
+        "imagesUploaded": 190180,
+        "gbPerYear": 650.029296875,
+        "autoMedianMin": 0.55030031737260288,
+        "autoP95Min": 1.1162888547823964,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.086881353812600412,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.733998080079274,
+        "casesToHuman": 28806,
+        "referableCases": 6742,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 5,
+        "computeP95WaitMin": 0.607302952616919,
+        "computeUtil24hPct": 9.774655143821871
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 61.265475233509115,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 3.0816203703703704,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 39.098620575287484,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 26.931596148169294,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 74.911111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 74.911111111111111,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 100000,
+          "des": 96879,
+          "diffPct": 3.2
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 29800,
+          "des": 28806,
+          "diffPct": 3.5
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 7000,
+          "des": 6742,
+          "diffPct": 3.8
+        }
+      ],
+      "flowTotal": [
+        100000.00000000156,
+        194472.25599999374,
+        194472.25599999374,
+        29799.999999998934,
+        7000.0000000001355
+      ],
+      "referralBacklogEndOfYear": 0,
+      "timing": {
+        "desSec": 0.2033419,
+        "flowSec": 0.0091157
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 100000,
+        "sites": 8,
+        "workers": 1,
+        "procMeanSec": 20,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 96879,
+        "unmetDemandPct": 2.0920711504389344,
+        "ungradableRatePct": 0.95285806299904918,
+        "imagesUploaded": 190180,
+        "gbPerYear": 650.029296875,
+        "autoMedianMin": 1.3118517851989964,
+        "autoP95Min": 3.7374285978466997,
+        "sameSessionPct": 100,
+        "turnaroundP95H": 0.1082645571556668,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.733998080079274,
+        "casesToHuman": 28806,
+        "referableCases": 6742,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 5,
+        "computeP95WaitMin": 3.0173715510891266,
+        "computeUtil24hPct": 17.700033594827641
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 61.265475233509115,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 3.0816203703703704,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 70.800134379310563,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 26.931596148169294,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 74.911111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "ophthalmologist",
+        "label": "Ophthalmologist",
+        "pct": 74.911111111111111,
+        "basis": "of appointment slots"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 100000,
+          "des": 96879,
+          "diffPct": 3.2
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 29800,
+          "des": 28806,
+          "diffPct": 3.5
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 7000,
+          "des": 6742,
+          "diffPct": 3.8
+        }
+      ],
+      "flowTotal": [
+        100000.00000000156,
+        194472.25599999374,
+        194472.25599999374,
+        29799.999999998934,
+        7000.0000000001355
+      ],
+      "referralBacklogEndOfYear": 0,
+      "timing": {
+        "desSec": 0.1908494,
+        "flowSec": 0.0071946
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 100000,
+        "sites": 8,
+        "workers": 1,
+        "procMeanSec": 40,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 96879,
+        "unmetDemandPct": 2.0920711504389344,
+        "ungradableRatePct": 0.95285806299904918,
+        "imagesUploaded": 190180,
+        "gbPerYear": 650.029296875,
+        "autoMedianMin": 71.977666587690692,
+        "autoP95Min": 154.56523565982661,
+        "sameSessionPct": 22.105925948864048,
+        "turnaroundP95H": 2.6757900329553648,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.733998080079274,
+        "casesToHuman": 28806,
+        "referableCases": 6742,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 4,
+        "computeP95WaitMin": 153.27100716263431,
+        "computeUtil24hPct": 35.311985708173808
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 61.265475233509115,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 3.0816203703703704,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 141.24794283269523,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 26.931596148169294,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 74.911111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "compute",
+        "label": "Compute workers",
+        "pct": 141.24794283269523,
+        "basis": "of session hours"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 100000,
+          "des": 96879,
+          "diffPct": 3.2
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 29791,
+          "des": 28806,
+          "diffPct": 3.4
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 6991,
+          "des": 6742,
+          "diffPct": 3.7
+        }
+      ],
+      "flowTotal": [
+        100000.00000000156,
+        194472.25599999374,
+        194472.25600000031,
+        29791.129362352542,
+        6991.4372198778128
+      ],
+      "referralBacklogEndOfYear": 6.48,
+      "timing": {
+        "desSec": 0.1936893,
+        "flowSec": 0.0077321
+      }
+    },
+    {
+      "engine": "matlab",
+      "params": {
+        "annualPatients": 100000,
+        "sites": 8,
+        "workers": 1,
+        "procMeanSec": 60,
+        "graderFTE": 2,
+        "ophthFTE": 1,
+        "uplinkMbps": 4,
+        "pReferable": 0.07,
+        "pDisagree": 0.22,
+        "workingDays": 250,
+        "sessionHours": 6
+      },
+      "des": {
+        "patientsScreened": 96879,
+        "unmetDemandPct": 2.0920711504389344,
+        "ungradableRatePct": 0.95285806299904918,
+        "imagesUploaded": 190180,
+        "gbPerYear": 650.029296875,
+        "autoMedianMin": 198.09279773278831,
+        "autoP95Min": 393.39526018239712,
+        "sameSessionPct": 8.2463691821757035,
+        "turnaroundP95H": 19.595031312105561,
+        "withinSlaPct": 100,
+        "humanTouchRatePct": 29.733998080079274,
+        "casesToHuman": 28806,
+        "referableCases": 6742,
+        "referralP95WaitDays": 0,
+        "referralMaxBacklog": 6,
+        "computeP95WaitMin": 391.41534254995076,
+        "computeUtil24hPct": 52.923937821519928
+      },
+      "utilisation": [
+        {
+          "key": "technician",
+          "label": "Technician",
+          "pct": 61.265475233509115,
+          "basis": "of session hours"
+        },
+        {
+          "key": "uplink",
+          "label": "Site uplink",
+          "pct": 3.0816203703703704,
+          "basis": "of session hours"
+        },
+        {
+          "key": "compute",
+          "label": "Compute workers",
+          "pct": 211.69575128607971,
+          "basis": "of session hours"
+        },
+        {
+          "key": "grader",
+          "label": "Graders",
+          "pct": 26.931596148169294,
+          "basis": "of shift hours"
+        },
+        {
+          "key": "ophthalmologist",
+          "label": "Ophthalmologist",
+          "pct": 74.911111111111111,
+          "basis": "of appointment slots"
+        }
+      ],
+      "bottleneck": {
+        "key": "compute",
+        "label": "Compute workers",
+        "pct": 211.69575128607971,
+        "basis": "of session hours"
+      },
+      "validation": [
+        {
+          "quantity": "Patients screened",
+          "flow": 100000,
+          "des": 96879,
+          "diffPct": 3.2
+        },
+        {
+          "quantity": "Images uploaded",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Images processed",
+          "flow": 194472,
+          "des": 190180,
+          "diffPct": 2.3
+        },
+        {
+          "quantity": "Human review cases",
+          "flow": 29754,
+          "des": 28806,
+          "diffPct": 3.3
+        },
+        {
+          "quantity": "Referrals",
+          "flow": 6985,
+          "des": 6742,
+          "diffPct": 3.6
+        }
+      ],
+      "flowTotal": [
+        100000.00000000156,
+        194472.25599999374,
+        194472.25599999973,
+        29754.352908236586,
+        6984.9581465852343
+      ],
+      "referralBacklogEndOfYear": 4.32,
+      "timing": {
+        "desSec": 0.191781,
+        "flowSec": 0.0073224
+      }
+    }
+  ]
+}

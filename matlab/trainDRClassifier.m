@@ -1,6 +1,28 @@
 function model = trainDRClassifier(dataDir, opts)
-% Train APTOS 2019 diabetic retinopathy classifier
+% Train the diabetic retinopathy classifier on APTOS 2019.
 % Designed for a GPU with about 6 GB VRAM.
+%
+% DATASET CHOICE
+%   APTOS 2019 Blindness Detection (3,662 labelled training images) is the
+%   training set: photographs from Aravind Eye Hospital taken in Indian
+%   screening camps, graded on the same ICDR 0-4 scale DRishti reports. That
+%   makes it the closest public match to the deployment setting, and at a few
+%   thousand images it trains in minutes, not days.
+%
+%   Evaluate on data the network never saw from a different camera:
+%     Messidor-2  - external test set (different population and camera)
+%     IDRiD       - pixel-level lesion masks, for checking segmentRetina
+%   EyePACS (88k images) is larger, but it comes from a US programme and its
+%   image quality varies widely; it costs far more to train on and is a worse
+%   match for Indian camps.
+%
+% Folder layout: dataDir/0, dataDir/1, ... dataDir/4, one folder per grade.
+%
+% USE THE WHOLE DATASET
+%   The first demo checkpoint was trained on 200 images per grade, which
+%   discarded about 70% of APTOS. MaxPerClass now defaults to Inf. Image
+%   datastores stream from disk, so the full set does not need to fit in
+%   RAM; lower MaxPerClass only for a quick smoke test.
 
 arguments
     dataDir (1,1) string
@@ -8,6 +30,7 @@ arguments
     opts.Backbone (1,1) string {mustBeMember( ...
         opts.Backbone, ["efficientnetb0","resnet50"])} = "efficientnetb0"
 
+    opts.MaxPerClass (1,1) double {mustBePositive} = Inf
     opts.MaxEpochs (1,1) double = 10
     opts.MiniBatchSize (1,1) double = 4
     opts.InitialLearnRate (1,1) double = 1e-4
@@ -35,8 +58,8 @@ disp("Dataset:");
 disp(countEachLabel(imds));
 
 %% ---------------------------------------------------------
-% 1b. SUBSAMPLE DATASET (insert right after imds is created, before splitEachLabel)
-maxPerClass = 200;   % <-- tune this to what your RAM can handle
+% 1b. OPTIONAL SUBSAMPLE (quick smoke tests only - see header)
+maxPerClass = opts.MaxPerClass;
 
 tbl = countEachLabel(imds);
 subIdxCells = cell(height(tbl),1);

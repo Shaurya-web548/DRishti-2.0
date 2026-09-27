@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Simulink capacity model{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/simulink.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="page-head sim-head">
+  <div class="wrap">
+    <span class="feature-tag">Major feature</span>
+    <h1>Where does a district screening programme break?</h1>
+    <p class="lede">A year of screening, simulated in MATLAB. Change the resources and the model
+       finds the queue that saturates first. The flow model runs from our Simulink block diagram,
+       and a discrete-event simulation of every patient checks it.</p>
+    <p class="engine" id="engineBadge" aria-live="polite">
+      <span class="engine-dot"></span><span id="engineText">Connecting to MATLAB&hellip;</span>
+    </p>
+  </div>
+</section>
+
+<section class="sim wrap">
+  <!-- ============================================================ controls -->
+  <form class="controls" id="simForm" novalidate aria-label="Scenario parameters">
+    <div class="presets" role="group" aria-label="Scenario presets">
+      <button type="button" class="preset active" data-preset="baseline">Baseline</button>
+      <button type="button" class="preset" data-preset="growth">150k patients</button>
+      <button type="button" class="preset" data-preset="minimum">Minimum feasible</button>
+      <button type="button" class="preset" data-preset="slow">Slow compute</button>
+    </div>
+
+    <fieldset>
+      <legend>Demand</legend>
+      <div class="slider" data-key="annualPatients" data-fmt="int">
+        <label for="s-annualPatients">Patients per year</label>
+        <output id="o-annualPatients"></output>
+        <input type="range" id="s-annualPatients" min="10000" max="400000" step="5000">
+      </div>
+      <div class="slider" data-key="sites" data-fmt="int">
+        <label for="s-sites">Screening camps per day</label>
+        <output id="o-sites"></output>
+        <input type="range" id="s-sites" min="1" max="30" step="1">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Compute</legend>
+      <div class="slider" data-key="workers" data-fmt="int">
+        <label for="s-workers">MATLAB workers</label>
+        <output id="o-workers"></output>
+        <input type="range" id="s-workers" min="1" max="16" step="1">
+      </div>
+      <div class="slider" data-key="procMeanSec" data-fmt="sec">
+        <label for="s-procMeanSec">Seconds per image</label>
+        <output id="o-procMeanSec"></output>
+        <input type="range" id="s-procMeanSec" min="2" max="180" step="1">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>People</legend>
+      <div class="slider" data-key="graderFTE" data-fmt="fte">
+        <label for="s-graderFTE">Graders (full-time)</label>
+        <output id="o-graderFTE"></output>
+        <input type="range" id="s-graderFTE" min="0.5" max="10" step="0.5">
+      </div>
+      <div class="slider" data-key="ophthFTE" data-fmt="fte">
+        <label for="s-ophthFTE">Ophthalmologists (full-time)</label>
+        <output id="o-ophthFTE"></output>
+        <input type="range" id="s-ophthFTE" min="0.25" max="6" step="0.25">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Network and clinic</legend>
+      <div class="slider" data-key="uplinkMbps" data-fmt="mbps" data-steps="0.1,0.25,0.5,1,2,4,8,16,32,50">
+        <label for="s-uplinkMbps">Uplink per camp</label>
+        <output id="o-uplinkMbps"></output>
+        <input type="range" id="s-uplinkMbps" min="0" max="9" step="1">
+      </div>
+      <div class="slider" data-key="pReferable" data-fmt="pct">
+        <label for="s-pReferable">Referable rate</label>
+        <output id="o-pReferable"></output>
+        <input type="range" id="s-pReferable" min="0.01" max="0.4" step="0.01">
+      </div>
+      <div class="slider" data-key="pDisagree" data-fmt="pct">
+        <label for="s-pDisagree">Grader disagreement rate</label>
+        <output id="o-pDisagree"></output>
+        <input type="range" id="s-pDisagree" min="0" max="0.6" step="0.01">
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn-feature run-btn" id="runBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>
+      Run simulation
+    </button>
+    <p class="controls-note">Results update by themselves a moment after you move a slider.</p>
+  </form>
+
+  <!-- ============================================================ results -->
+  <div class="results" id="results" aria-live="polite">
+    <div class="busy" id="busy" hidden>
+      <div class="busy-ring" aria-hidden="true"></div>
+      <p id="busyText">Simulating 250 working days&hellip;</p>
+    </div>
+
+    <div class="error-box hidden" id="simError" role="alert"></div>
+
+    <div class="verdict" id="verdict">
+      <span class="verdict-kicker">Bottleneck</span>
+      <h2 id="verdictTitle">&nbsp;</h2>
+      <p id="verdictText">&nbsp;</p>
+    </div>
+
+    <figure class="diagram">
+      <figcaption>
+        <strong>Simulink flow model</strong>
+        <span>Each block is a backlog integrator. Colour shows how busy the resource is.</span>
+      </figcaption>
+      <svg id="diagram" viewBox="0 0 900 188" role="img" aria-label="Block diagram of the five pipeline stages with their utilisation"></svg>
+    </figure>
+
+    <section class="block" aria-labelledby="utilTitle">
+      <div class="block-head">
+        <h3 id="utilTitle">Resource utilisation</h3>
+        <span class="block-note">Discrete-event simulation of every patient</span>
+      </div>
+      <div class="bars" id="bars"></div>
+      <p class="bars-key"><span class="k-line"></span>85% planning limit &nbsp; <span class="k-line red"></span>100% &mdash; the queue never drains</p>
+    </section>
+
+    <section class="kpis" id="kpis" aria-label="Programme outcomes"></section>
+
+    <section class="block" aria-labelledby="dayTitle">
+      <div class="block-head">
+        <h3 id="dayTitle">Three typical days</h3>
+        <div class="toggle" role="group" aria-label="Series to show">
+          <button type="button" class="on" data-series="flow">Throughput</button>
+          <button type="button" data-series="backlog">Backlog</button>
+        </div>
+      </div>
+      <p class="block-note" id="dayNote">Every camp captures inside the same six-hour session, so work
+         arrives in daily bursts. Watch which stages drain before the next day starts.</p>
+      <svg class="chart" id="dayChart" viewBox="0 0 860 280" role="img" aria-label="Throughput or backlog of each stage over three days"></svg>
+      <ul class="legend" id="dayLegend"></ul>
+    </section>
+
+    <section class="block" aria-labelledby="yearTitle">
+      <div class="block-head">
+        <h3 id="yearTitle">Specialist backlog across the year</h3>
+      </div>
+      <p class="block-note">Patients waiting for an ophthalmologist at the end of each working day.
+         A line that keeps rising means the clinic can never catch up.</p>
+      <svg class="chart" id="yearChart" viewBox="0 0 860 240" role="img" aria-label="Referral backlog at the end of each day of the year"></svg>
+    </section>
+
+    <section class="block" aria-labelledby="valTitle">
+      <div class="block-head">
+        <h3 id="valTitle">Two models, one answer</h3>
+        <span class="block-note">Annual totals, flow model versus discrete-event reference</span>
+      </div>
+      <div class="table-wrap">
+        <table class="val-table">
+          <thead><tr><th scope="col">Quantity</th><th scope="col">Flow model</th><th scope="col">Discrete-event</th><th scope="col">Difference</th></tr></thead>
+          <tbody id="valBody"></tbody>
+        </table>
+      </div>
+      <p class="block-note">The flow model is deterministic and serves every arrival, while the
+         discrete-event model turns away patients a session cannot seat. A gap of a few percent is
+         expected; a large one would mean a parameter was mistranslated between the two.</p>
+    </section>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/simulink.js') }}"></script>
+{% endblock %}

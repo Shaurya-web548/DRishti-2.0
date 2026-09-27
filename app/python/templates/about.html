@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set project = team.project %}
+<section class="page-head about-head">
+  <div class="wrap">
+    <span class="eyebrow">About {{ project.name or 'DRishti' }}</span>
+    <h1>Specialist attention, spent where it&rsquo;s needed.</h1>
+    <p class="lede">DRishti screens retinal photographs for diabetic retinopathy so that the few
+       ophthalmologists a district has can see the patients who actually need them.
+       {% if project.event %}Built for the {{ project.event }}{% if project.problemStatement %}, problem statement {{ project.problemStatement }}{% endif %}.{% endif %}</p>
+  </div>
+</section>
+
+<!-- ========================================================== problem -->
+<section class="section problem">
+  <div class="wrap problem-grid">
+    <div>
+      <span class="eyebrow reveal">The problem</span>
+      <h2 class="reveal" style="--delay:.06s">A preventable blindness that nobody feels coming.</h2>
+    </div>
+    <div class="problem-points">
+      <p class="reveal">Diabetic retinopathy damages the tiny blood vessels of the retina. It is one of
+         the leading causes of preventable vision loss in working-age adults, and it has no symptoms
+         until the damage is advanced.</p>
+      <p class="reveal" style="--delay:.08s">Caught early, its progress can usually be slowed or
+         stopped. That is why every person with diabetes should have their retina checked once a year.</p>
+      <p class="reveal" style="--delay:.16s"><strong>The check is what doesn&rsquo;t happen.</strong>
+         Grading a retinal photograph needs trained eyes, and in a rural district there are far too
+         few specialists to look at everyone. DRishti does the first look, so specialists only see the
+         patients who need treatment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== values -->
+<section class="section values">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal">What we believe</span>
+      <h2 class="reveal" style="--delay:.06s">Principles we built around.</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value reveal" style="--delay:.00s">
+        <span class="v-num">01</span>
+        <h3>Uncertainty reaches a human</h3>
+        <p>When our two graders disagree, the case goes to a person. It is never rounded away into a
+           confident-looking number.</p>
+      </div>
+      <div class="value reveal" style="--delay:.08s">
+        <span class="v-num">02</span>
+        <h3>Miss nothing, over-refer a little</h3>
+        <p>A missed case costs far more than a false alarm, so the referral threshold is tuned for
+           sensitivity rather than overall accuracy.</p>
+      </div>
+      <div class="value reveal" style="--delay:.16s">
+        <span class="v-num">03</span>
+        <h3>Show the working</h3>
+        <p>Every grade comes with the lesions and criteria behind it, so a clinician can check and
+           overrule a specific finding.</p>
+      </div>
+      <div class="value reveal" style="--delay:.24s">
+        <span class="v-num">04</span>
+        <h3>Say what doesn&rsquo;t work yet</h3>
+        <p>Weak parts are labelled weak, in the code and on this page. That is what makes the rest
+           of the numbers believable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= team -->
+<section class="section team" id="team">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal">The team</span>
+      <h2 class="reveal" style="--delay:.06s">The people behind DRishti.</h2>
+    </div>
+
+    <ul class="team-grid">
+      {% for m in team.members %}
+      <li class="member reveal{% if not m.has_name %} is-pending{% endif %}" style="--delay:{{ '%.2f' % (loop.index0 * 0.07) }}s">
+        <div class="avatar" aria-hidden="true">
+          {% if m.photo %}<img src="{{ m.photo }}" alt="">{% elif m.initials %}{{ m.initials }}{% else %}
+          <svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="currentColor"/></svg>{% endif %}
+        </div>
+        <h3>{{ m.name if m.has_name else 'Team member' }}</h3>
+        <p class="role">{{ m.role or ('Team member' if m.has_name else 'Details coming soon') }}</p>
+        {% if m.program %}<p class="program">{{ m.program }}</p>{% endif %}
+        {% if m.focus %}<p class="focus">{{ m.focus }}</p>{% endif %}
+        {% if m.github or m.linkedin or m.email %}
+        <div class="links">
+          {% if m.github %}<a href="{{ m.github }}" rel="noopener" aria-label="{{ m.name }} on GitHub">GitHub</a>{% endif %}
+          {% if m.linkedin %}<a href="{{ m.linkedin }}" rel="noopener" aria-label="{{ m.name }} on LinkedIn">LinkedIn</a>{% endif %}
+          {% if m.email %}<a href="mailto:{{ m.email }}" aria-label="Email {{ m.name }}">Email</a>{% endif %}
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% set named_mentors = team.mentors | selectattr('has_name') | list %}
+    {% if named_mentors %}
+    <div class="mentors reveal">
+      <h3>Mentor{{ 's' if named_mentors|length > 1 }}</h3>
+      <ul>
+        {% for m in named_mentors %}
+        <li>
+          <strong>{{ m.name if m.has_name else 'Faculty mentor' }}</strong>
+          <span>{{ m.role }}{% if m.affiliation %}, {{ m.affiliation }}{% elif not m.has_name %} &middot; details coming soon{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ========================================================== numbers -->
+<section class="section section-dark built">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal" style="color:var(--amber-2)">What we built</span>
+      <h2 class="reveal" style="--delay:.06s">A working system, measured end to end.</h2>
+    </div>
+    <dl class="built-grid">
+      <div class="reveal"><dt class="num" data-count="5">0</dt><dd>pipeline stages, from quality gate to patient report</dd></div>
+      <div class="reveal" style="--delay:.08s"><dt class="num" data-count="2">0</dt><dd>independent graders that must agree before a result stands</dd></div>
+      <div class="reveal" style="--delay:.16s"><dt class="num" data-count="250">0</dt><dd>working days simulated in the district capacity model</dd></div>
+      <div class="reveal" style="--delay:.24s"><dt class="num" data-count="61">0</dt><dd>automated checks on the image-processing layer</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ======================================================= data + tech -->
+<section class="section stack">
+  <div class="wrap stack-grid">
+    <div>
+      <span class="eyebrow reveal">Data</span>
+      <h2 class="reveal" style="--delay:.06s">What the model learns from, and what checks it.</h2>
+      <ul class="data-list">
+        <li class="reveal">
+          <strong>APTOS 2019 &middot; training</strong>
+          <span>3,662 graded fundus photographs from Aravind Eye Hospital, taken in Indian screening
+                conditions and labelled on the same 0&ndash;4 scale we report. The closest public match to
+                the camps DRishti is built for.</span>
+        </li>
+        <li class="reveal" style="--delay:.08s">
+          <strong>Messidor-2 &middot; external test</strong>
+          <span>A different population and camera, held out entirely, to catch a model that has only
+                learned one clinic&rsquo;s photographs.</span>
+        </li>
+        <li class="reveal" style="--delay:.16s">
+          <strong>IDRiD &middot; lesion checks</strong>
+          <span>Indian images with pixel-level outlines of microaneurysms, haemorrhages and exudates,
+                which is exactly what our rule-based grader detects.</span>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <span class="eyebrow reveal">Built with</span>
+      <h2 class="reveal" style="--delay:.06s">Technology.</h2>
+      <ul class="tech">
+        <li class="reveal"><strong>MATLAB</strong><span>Image analysis, both graders, capacity models</span></li>
+        <li class="reveal" style="--delay:.05s"><strong>Simulink</strong><span>District flow model</span></li>
+        <li class="reveal" style="--delay:.10s"><strong>Python &amp; Flask</strong><span>Web app and MATLAB Engine bridge</span></li>
+        <li class="reveal" style="--delay:.15s"><strong>EfficientNet-B0</strong><span>Neural grader, transfer-learned</span></li>
+        <li class="reveal" style="--delay:.20s"><strong>fpdf2</strong><span>Patient PDF reports</span></li>
+        <li class="reveal" style="--delay:.25s"><strong>Gemini</strong><span>Plain-language wording only, never the grade</span></li>
+        <li class="reveal" style="--delay:.30s"><strong>HTML, CSS &amp; SVG</strong><span>Animated interface that works offline</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ safety -->
+<section class="section safety">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal">Safety, privacy and ethics</span>
+      <h2 class="reveal" style="--delay:.06s">Where DRishti stops.</h2>
+    </div>
+    <div class="safety-grid">
+      <div class="reveal">
+        <h3>Not a medical device</h3>
+        <p>DRishti gives a screening signal and a referral decision, never a diagnosis or treatment.
+           It has not been clinically validated, and every report says so.</p>
+      </div>
+      <div class="reveal" style="--delay:.08s">
+        <h3>Patient data stays local</h3>
+        <p>Photographs and results are stored on the screening server. When a language-model key is
+           set, only the grade, the referral flag and the grading mode are sent to write the
+           plain-language paragraph. No image, name or age ever leaves the machine.</p>
+      </div>
+      <div class="reveal" style="--delay:.16s">
+        <h3>A person makes the call</h3>
+        <p>Disagreement between the graders goes to a trained human reviewer, and every referral ends
+           with an ophthalmologist. The system is allowed to say &ldquo;a person should look at this.&rdquo;</p>
+      </div>
+    </div>
+
+    <div class="limits reveal">
+      <h3>What doesn&rsquo;t work yet</h3>
+      <ul>
+        <li><strong>The shipped network is a demo.</strong> It was fine-tuned for 3 epochs on a small
+            subsample, so we quote no accuracy for it. Full training on the datasets above is next.</li>
+        <li><strong>Venous beading and IRMA are not detected automatically.</strong> Two of the three
+            severe-grade triggers therefore depend on outside input.</li>
+        <li><strong>New-vessel detection is an experimental proxy.</strong> It can fire on dense but
+            normal vessels.</li>
+        <li><strong>Haemorrhages are found but not sub-typed</strong> into dot, blot or flame.</li>
+        <li><strong>Scans are held in memory</strong> and do not survive a server restart.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= links -->
+<section class="closing-about">
+  <div class="wrap closing-grid reveal">
+    <div>
+      <h2>Explore the project</h2>
+      <p>Read the source, try a screening, or stress-test a district in the Simulink model.</p>
+    </div>
+    <div class="cta-row">
+      {% if project.repository %}<a class="btn btn-outline" href="{{ project.repository }}" rel="noopener">Source code</a>{% endif %}
+      <a class="btn btn-primary" href="{{ url_for('scan_page') }}">Start a screening</a>
+      <a class="btn btn-feature" href="{{ url_for('simulink_page') }}">Simulink model</a>
+    </div>
+  </div>
+  <p class="wrap ack">With thanks to Aravind Eye Hospital and APTOS for the training images, to the
+     creators of Messidor-2 and IDRiD, and to the Smart India Hackathon for the problem statement.</p>
+</section>
+{% endblock %}

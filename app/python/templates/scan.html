@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Screen an eye{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scan.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">Screening tool</span>
+    <h1>Screen an eye</h1>
+    <p class="lede">Upload a clear fundus photograph. DRishti checks its quality, finds the
+       lesions, grades it on the ICDR scale and tells you whether to refer.</p>
+  </div>
+</section>
+
+<section class="tool wrap">
+  <div class="tool-grid">
+    <div class="panel" id="scan">
+      <form id="scanForm" novalidate>
+        <label class="upload-drop" id="uploadDrop">
+          <input type="file" id="imageInput" accept="image/png, image/jpeg" hidden required>
+          <span class="upload-icon" aria-hidden="true">
+            <svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span id="uploadLabel" class="upload-label">Click to choose a fundus image, or drag one here</span>
+          <span class="upload-hint">PNG or JPG, up to 20 MB</span>
+        </label>
+        <img id="previewImg" class="preview hidden" alt="Selected fundus photograph">
+        <button type="submit" class="btn btn-primary btn-wide" id="submitBtn">Analyse image</button>
+      </form>
+
+      <div id="loadingState" class="loading-state hidden" role="status" aria-live="polite">
+        <div class="scan-loader" aria-hidden="true"><span class="sweep"></span><span class="core"></span></div>
+        <p class="loading-title">Analysing&hellip;</p>
+        <ol class="loading-steps" id="loadingSteps">
+          <li>Checking image quality</li>
+          <li>Segmenting vessels and lesions</li>
+          <li>Grading on the ICDR scale</li>
+          <li>Preparing the overlay</li>
+        </ol>
+        <p class="loading-note">The first scan also starts MATLAB, which takes about 20 seconds.</p>
+      </div>
+
+      <div id="errorState" class="error-box hidden" role="alert"></div>
+
+      <div id="resultState" class="result-state hidden">
+        <div class="result-header">
+          <span id="modeBadge" class="mode-badge"></span>
+          <div class="grade-line">
+            <span class="grade-chip" id="gradeChip">&ndash;</span>
+            <div>
+              <h2 id="gradeHeadline"></h2>
+              <p id="referLine" class="refer-line"></p>
+            </div>
+          </div>
+          <div class="grade-scale" id="gradeScale" aria-hidden="true">
+            <span data-g="0"></span><span data-g="1"></span><span data-g="2"></span><span data-g="3"></span><span data-g="4"></span>
+          </div>
+          <p id="confidenceLine" class="muted"></p>
+        </div>
+
+        <div class="result-images">
+          <figure>
+            <img id="imgOriginal" alt="Original scan">
+            <figcaption>Original scan</figcaption>
+          </figure>
+          <figure id="figOverlay" class="hidden">
+            <img id="imgOverlay" alt="Lesion overlay">
+            <figcaption>Lesion overlay</figcaption>
+          </figure>
+          <figure id="figGradcam" class="hidden">
+            <img id="imgGradcam" alt="Grad-CAM heatmap">
+            <figcaption>Grad-CAM (where the network looked)</figcaption>
+          </figure>
+        </div>
+
+        <form class="report-form" id="reportForm" novalidate>
+          <h3>Download the PDF report</h3>
+          <div class="report-fields">
+            <label>
+              <span>Patient name</span>
+              <input type="text" id="patientName" maxlength="80" autocomplete="off">
+            </label>
+            <label>
+              <span>Age (years)</span>
+              <input type="number" id="patientAge" min="0" max="120" step="1" inputmode="numeric"
+                     aria-describedby="ageError">
+            </label>
+            <label>
+              <span>Clinic / location</span>
+              <input type="text" id="patientLocation" maxlength="80" autocomplete="off">
+            </label>
+          </div>
+          <p id="ageError" class="field-error hidden" role="alert"></p>
+          <button type="submit" class="btn btn-primary" id="downloadReportBtn">Download PDF report</button>
+        </form>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="side-block">
+        <h3>For a gradeable photo</h3>
+        <ul class="tips">
+          <li>Centre the optic disc and macula in the frame.</li>
+          <li>Avoid eyelashes, glare and dark corners.</li>
+          <li>Refocus if the vessels look soft.</li>
+        </ul>
+      </div>
+      <div class="side-block">
+        <h3>How to read the result</h3>
+        <ul class="legend">
+          <li><span style="--c:var(--g0)"></span>0 &middot; No apparent DR</li>
+          <li><span style="--c:var(--g1)"></span>1 &middot; Mild NPDR</li>
+          <li><span style="--c:var(--g2)"></span>2 &middot; Moderate NPDR &mdash; refer</li>
+          <li><span style="--c:var(--g3)"></span>3 &middot; Severe NPDR &mdash; refer</li>
+          <li><span style="--c:var(--g4)"></span>4 &middot; Proliferative DR &mdash; refer</li>
+        </ul>
+      </div>
+      <p class="side-note">A screening signal, not a diagnosis. Always confirm with a qualified
+         eye care professional. <a href="{{ url_for('how_it_works') }}">How grading works</a></p>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+{% endblock %}

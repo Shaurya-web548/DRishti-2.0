@@ -1,0 +1,11 @@
+{
+  "name": "drishti-project-report",
+  "private": true,
+  "description": "Builds the DRishti project report (.docx) from measured data and the team roster.",
+  "scripts": {
+    "build": "node build_report.js"
+  },
+  "dependencies": {
+    "docx": "^9.0.0"
+  }
+}
