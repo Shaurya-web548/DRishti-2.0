@@ -269,8 +269,9 @@ There are two ways to put DRishti online, and they work together.
 
 | | Live server (your laptop) | Website (GitHub Pages) |
 |---|---|---|
-| Start it | Double-click **Go Live.cmd** (or run `.un-public.ps1`) | Run `.\publish-site.ps1` after changing the site |
-| Address | Random `https://…trycloudflare.com`, new on every start | https://shaurya-web548.github.io/DRishti-site/ (permanent) |
+| Start it | Double-click **Go Live.cmd** (or run `.
+un-public.ps1`) | Run `.\publish-site.ps1` after changing the site |
+| Address | Random `https://…trycloudflare.com`, new on every start | https://drishti.kandu.kr/ (permanent, GitHub Pages) |
 | Screening | Yes, runs MATLAB | Links to the live server when it is online |
 | Simulink model | Runs in MATLAB | Runs in the visitor's browser (JavaScript ports) |
 | Needs | This laptop on, window open | Nothing, always up |
@@ -285,6 +286,18 @@ that stops MATLAB and marks the website offline.
   10 minutes each) and uploaded photographs are deleted after 24 hours.
   Tune with `SCAN_LIMIT`, `REPORT_LIMIT`, `SIMULATE_LIMIT` and
   `RESULTS_MAX_AGE_HOURS` in `.env`.
+- **Permanent address.** With a domain on Cloudflare, the live server can keep
+  one fixed address (e.g. `https://drishti.example.com`) instead of a new
+  random link each time. In the Cloudflare dashboard go to Zero Trust →
+  Networks → Tunnels → Create a tunnel (cloudflared), copy its token, and add
+  a Public Hostname pointing to `http://localhost:5000`. Put the token in `.env`
+  as `CLOUDFLARE_TUNNEL_TOKEN`, set `project.liveUrl` in
+  `app/python/content/team.json` to the address, and re-run `publish-site.ps1`
+  so the website accepts it. The laptop still has to be on.
+  Without the Zero Trust dashboard, create it from PowerShell instead:
+  `tools\cloudflared\cloudflared.exe tunnel login`, then `... tunnel create drishti`,
+  `... tunnel route dns drishti drishti.example.com` and `... tunnel token drishti`
+  (the last one prints the token for `.env`).
 - Never expose `run-local.ps1`: it runs Flask's debugger, which must not be
   reachable from the internet.
 - Serving MATLAB results publicly is subject to your MATLAB licence terms.

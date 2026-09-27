@@ -37,7 +37,7 @@ def test_static_build(tmp_path):
 
     # code repos are private, so no source links on the public site
     assert "github.com/Shaurya-web548/DRishti-2.0" not in home
-    assert 'href="https://shaurya-web548.github.io/DRishti-site/"' in home
+    assert 'href="https://drishti.kandu.kr/"' in home
 
     # the running app is back in normal mode afterwards
     assert app_module.app.config["STATIC_SITE"] is False
@@ -46,5 +46,5 @@ def test_static_build(tmp_path):
 def test_health_endpoint_allows_only_the_pages_origin(client):
     res = client.get("/api/health")
     assert res.get_json() == {"ok": True}
-    assert res.headers["Access-Control-Allow-Origin"] == "https://shaurya-web548.github.io"
+    assert res.headers["Access-Control-Allow-Origin"] == "https://drishti.kandu.kr"
     assert res.headers["Cache-Control"] == "no-store"

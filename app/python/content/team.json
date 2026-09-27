@@ -1,5 +1,5 @@
 {
-  "_readme": "Edit this one file to update the team everywhere: the About page reads it on every request, and tools/report/build_report.js reads it when generating the project report. Links must start with https:// (anything else is dropped for safety). showSourceLinks: set true once the code repositories are public; while they are private the site hides links that would 404 for visitors. siteRepository is the public repo that holds only the built website (GitHub Pages).",
+  "_readme": "Edit this one file to update the team everywhere: the About page reads it on every request, and tools/report/build_report.js reads it when generating the project report. Links must start with https:// (anything else is dropped for safety). showSourceLinks: set true once the code repositories are public; while they are private the site hides links that would 404 for visitors. siteRepository is the public repo that holds only the built website (GitHub Pages). liveUrl: the permanent address of the live server (e.g. https://drishti.example.com) when run-public.ps1 uses a named Cloudflare tunnel; leave empty for the random trycloudflare.com link.",
   "project": {
     "name": "DRishti",
     "tagline": "Diabetic retinopathy screening that a district can actually run",
@@ -10,7 +10,8 @@
     "previousVersion": "https://github.com/Shaurya-web548/DRishti",
     "showSourceLinks": false,
     "siteRepository": "https://github.com/Shaurya-web548/DRishti-site",
-    "projectPage": "https://shaurya-web548.github.io/DRishti-site/"
+    "projectPage": "https://drishti.kandu.kr/",
+    "liveUrl": ""
   },
   "mentors": [
     {
@@ -23,7 +24,7 @@
   "members": [
     {
       "name": "Shaurya Agarwal",
-      "role": "", "focus": "", "program": "", "email": "",
+      "role": "Team Leader", "focus": "", "program": "", "email": "",
       "github": "https://github.com/Shaurya-web548",
       "linkedin": "https://www.linkedin.com/in/shaurya-agarwal-aa268127a",
       "pending": false

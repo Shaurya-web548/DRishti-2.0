@@ -1,6 +1,7 @@
 # Tells the GitHub Pages site whether live screening is running.
 #
 #   .\tools\live-status.ps1 -Url https://abc.trycloudflare.com   # online
+#   .\tools\live-status.ps1 -Url <project.liveUrl in team.json>  # online, named tunnel
 #   .\tools\live-status.ps1 -Offline                              # offline
 #
 # Writes live.json to the `live` branch of the public site repository named in
@@ -16,14 +17,16 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
-if (-not $Offline -and $Url -notmatch '^https://[a-z0-9-]+\.trycloudflare\.com$') {
-    throw "Pass -Url https://<name>.trycloudflare.com, or -Offline."
+$team = Get-Content (Join-Path $root "app\python\content\team.json") -Raw | ConvertFrom-Json
+$liveUrl = "$($team.project.liveUrl)".Trim().TrimEnd('/')
+
+if (-not $Offline -and $Url -notmatch '^https://[a-z0-9-]+\.trycloudflare\.com$' -and -not ($liveUrl -and $Url -eq $liveUrl)) {
+    throw "Pass -Url https://<name>.trycloudflare.com (or the project.liveUrl from team.json), or -Offline."
 }
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "The GitHub CLI (gh) is not installed, so the Pages site cannot be told."
 }
 
-$team = Get-Content (Join-Path $root "app\python\content\team.json") -Raw | ConvertFrom-Json
 # The public site repository: the code repository may be private, and the
 # website has to be able to read this file without logging in.
 $repo = ($team.project.siteRepository -replace '^https://github.com/', '').TrimEnd('/')

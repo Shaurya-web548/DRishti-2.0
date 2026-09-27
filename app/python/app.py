@@ -22,6 +22,7 @@ Then open http://localhost:5000
 import functools
 import logging
 import os
+import re
 import uuid
 
 from flask import (Flask, abort, jsonify, render_template, request,
@@ -94,13 +95,28 @@ def rate_limited(limiter_name):
 # scan page points visitors at the live server instead.
 app.config.setdefault("STATIC_SITE", False)
 
+def _pages_origin() -> str:
+    """Origin of the public website (project.projectPage in team.json),
+    e.g. https://drishti.example.com. PAGES_ORIGIN overrides it."""
+    page = load_team().get("project", {}).get("projectPage") or ""
+    m = re.match(r"https://[A-Za-z0-9.-]+", page.strip())
+    return m.group(0).lower() if m else "https://shaurya-web548.github.io"
+
+
 # The GitHub Pages site may ask the live server whether it is up.
-PAGES_ORIGIN = os.environ.get("PAGES_ORIGIN", "https://shaurya-web548.github.io")
+PAGES_ORIGIN = os.environ.get("PAGES_ORIGIN") or _pages_origin()
 
 
 def _github_slug(url: str) -> str:
     url = (url or "").rstrip("/")
     return url.split("github.com/")[-1] if "github.com/" in url else ""
+
+
+def _live_url(value) -> str:
+    """The permanent live-server address from team.json, if it is a bare
+    https:// origin. Anything else is dropped, since the scan page links to it."""
+    url = (value or "").strip().rstrip("/")
+    return url if re.fullmatch(r"https://[a-z0-9.-]+\.[a-z]{2,}", url) else ""
 
 
 @app.context_processor
@@ -114,6 +130,7 @@ def site_mode():
         "repo_slug": _github_slug(live_repo),
         "project": project,
         "show_source_links": bool(project.get("showSourceLinks")),
+        "live_url": _live_url(project.get("liveUrl")),
     }
 
 
