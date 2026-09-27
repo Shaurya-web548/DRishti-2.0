@@ -9,8 +9,11 @@
 #   - per-visitor rate limits and 24-hour deletion of uploaded photographs
 #   - listens on 127.0.0.1 only; the public reaches it through cloudflared
 #
-# The link changes every time this script starts, and it only works while
-# this laptop is on and the script is running.
+# By default the link is a random trycloudflare.com address that changes on
+# every start. For a permanent address (e.g. https://drishti.example.com),
+# create a named tunnel in the Cloudflare dashboard, put its token in .env as
+# CLOUDFLARE_TUNNEL_TOKEN and the address in team.json as project.liveUrl.
+# Either way it only works while this laptop is on and the script is running.
 param([int]$Port = 5000)
 
 $ErrorActionPreference = "Stop"
@@ -93,20 +96,51 @@ try {
     if (-not $up) { throw "The server did not answer within 90 seconds. See $serverErr" }
 
     # ------------------------------------------------------------ tunnel
-    Write-Step "Opening the Cloudflare tunnel"
-    $tunnel = Start-Process -FilePath $cloudflared `
-        -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$Port" `
-        -RedirectStandardError $tunnelLog -RedirectStandardOutput "$tunnelLog.out" -WindowStyle Hidden -PassThru
+    $siteUrl = $null
+    $liveUrl = $null
+    try {
+        $project = (Get-Content (Join-Path $appDir "content\team.json") -Raw | ConvertFrom-Json).project
+        $siteUrl = $project.projectPage
+        $liveUrl = "$($project.liveUrl)".Trim().TrimEnd('/')
+    } catch { }
+    $token = "$env:CLOUDFLARE_TUNNEL_TOKEN".Trim()
 
     $url = $null
-    for ($i = 0; $i -lt 60 -and -not $url; $i++) {
-        Start-Sleep -Seconds 1
-        if ($tunnel.HasExited) { throw "cloudflared stopped. See $tunnelLog" }
-        $hit = Select-String -Path $tunnelLog -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue |
-               Select-Object -First 1
-        if ($hit) { $url = $hit.Matches[0].Value }
+    if ($token) {
+        # Named tunnel: the address is fixed and routed in the Cloudflare
+        # dashboard (Public Hostname -> http://localhost:$Port).
+        if ($liveUrl -notmatch '^https://[a-z0-9.-]+\.[a-z]{2,}$') {
+            throw "CLOUDFLARE_TUNNEL_TOKEN is set, so put the tunnel's address in team.json as project.liveUrl (e.g. https://drishti.example.com)."
+        }
+        Write-Step "Opening the named Cloudflare tunnel for $liveUrl"
+        # The token goes through the environment, not the command line, so it
+        # does not show up in process listings.
+        $env:TUNNEL_TOKEN = $token
+        $tunnel = Start-Process -FilePath $cloudflared `
+            -ArgumentList "tunnel", "--no-autoupdate", "run" `
+            -RedirectStandardError $tunnelLog -RedirectStandardOutput "$tunnelLog.out" -WindowStyle Hidden -PassThru
+
+        for ($i = 0; $i -lt 60 -and -not $url; $i++) {
+            Start-Sleep -Seconds 1
+            if ($tunnel.HasExited) { throw "cloudflared stopped - check CLOUDFLARE_TUNNEL_TOKEN. See $tunnelLog" }
+            if (Select-String -Path $tunnelLog -Pattern 'Registered tunnel connection' -Quiet -ErrorAction SilentlyContinue) { $url = $liveUrl }
+        }
+        if (-not $url) { throw "The named tunnel did not connect within 60 seconds. See $tunnelLog" }
+    } else {
+        Write-Step "Opening the Cloudflare tunnel"
+        $tunnel = Start-Process -FilePath $cloudflared `
+            -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$Port" `
+            -RedirectStandardError $tunnelLog -RedirectStandardOutput "$tunnelLog.out" -WindowStyle Hidden -PassThru
+
+        for ($i = 0; $i -lt 60 -and -not $url; $i++) {
+            Start-Sleep -Seconds 1
+            if ($tunnel.HasExited) { throw "cloudflared stopped. See $tunnelLog" }
+            $hit = Select-String -Path $tunnelLog -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -ErrorAction SilentlyContinue |
+                   Select-Object -First 1
+            if ($hit) { $url = $hit.Matches[0].Value }
+        }
+        if (-not $url) { throw "No public link appeared within 60 seconds. See $tunnelLog" }
     }
-    if (-not $url) { throw "No public link appeared within 60 seconds. See $tunnelLog" }
 
     Set-Content -Path (Join-Path $logDir "public-url.txt") -Value $url
 
@@ -118,8 +152,6 @@ try {
         Write-Warning "Live, but the GitHub Pages site could not be told: $($_.Exception.Message)"
     }
 
-    $siteUrl = $null
-    try { $siteUrl = (Get-Content (Join-Path $appDir "content	eam.json") -Raw | ConvertFrom-Json).project.projectPage } catch { }
     Write-Host ""
     Write-Host "  DRishti is live at:  $url" -ForegroundColor Green
     Write-Host "  Simulink demo:       $url/simulink?preset=growth" -ForegroundColor Green

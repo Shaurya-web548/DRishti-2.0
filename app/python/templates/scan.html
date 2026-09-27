@@ -17,7 +17,7 @@
 <section class="tool wrap">
   <div class="tool-grid">
     {% if static_site %}
-    <div class="panel live-panel" id="scan" data-repo="{{ repo_slug }}">
+    <div class="panel live-panel" id="scan" data-repo="{{ repo_slug }}" data-live-url="{{ live_url }}">
       <div class="live-state" id="liveState" data-state="checking" role="status" aria-live="polite">
         <span class="live-orb" aria-hidden="true"></span>
         <h2 id="liveTitle">Checking whether live screening is online&hellip;</h2>

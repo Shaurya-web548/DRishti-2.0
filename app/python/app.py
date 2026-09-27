@@ -22,6 +22,7 @@ Then open http://localhost:5000
 import functools
 import logging
 import os
+import re
 import uuid
 
 from flask import (Flask, abort, jsonify, render_template, request,
@@ -103,6 +104,13 @@ def _github_slug(url: str) -> str:
     return url.split("github.com/")[-1] if "github.com/" in url else ""
 
 
+def _live_url(value) -> str:
+    """The permanent live-server address from team.json, if it is a bare
+    https:// origin. Anything else is dropped, since the scan page links to it."""
+    url = (value or "").strip().rstrip("/")
+    return url if re.fullmatch(r"https://[a-z0-9.-]+\.[a-z]{2,}", url) else ""
+
+
 @app.context_processor
 def site_mode():
     """Values every template may need. The live-status file lives in the
@@ -114,6 +122,7 @@ def site_mode():
         "repo_slug": _github_slug(live_repo),
         "project": project,
         "show_source_links": bool(project.get("showSourceLinks")),
+        "live_url": _live_url(project.get("liveUrl")),
     }
 
 
